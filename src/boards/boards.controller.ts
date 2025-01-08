@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -29,7 +30,11 @@ export class BoardsController {
 
   @Get('/:id')
   getBoardById(@Param('id') id: string): Board {
-    return this.boardService.getBoardById(id);
+    const found = this.boardService.getBoardById(id);
+    if (!found) {
+      throw new NotFoundException(`can't find Board with id ${id}`);
+    }
+    return found;
   }
 
   @Delete('/:id')
