@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UsePipes,
   ValidationPipe,
@@ -12,6 +13,8 @@ import {
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { Board } from './board.entity';
+import { BoardStatus } from './board-status.enum';
+import { BoardStatusValidationPipe } from './pipes/board-status-validation.pipe';
 
 @Controller('boards')
 export class BoardsController {
@@ -37,11 +40,11 @@ export class BoardsController {
     return this.boardService.deleteBoard(id);
   }
 
-  //   @Patch('/:id/status')
-  //   updateBoardStatus(
-  //     @Param('id') id: string,
-  //     @Body('status', BoardStatusValidationPipe) status: BoardStatus,
-  //   ): Board {
-  //     return this.boardService.updateBoardStatus(id, status);
-  //   }
+  @Patch('/:id/status')
+  updateBoardStatus(
+    @Param('id') id: number,
+    @Body('status', BoardStatusValidationPipe) status: BoardStatus,
+  ): Promise<Board> {
+    return this.boardService.updateBoardStatus(id, status);
+  }
 }
