@@ -11,12 +11,12 @@ export class BoardsService {
   constructor(
     @InjectRepository(BoardRepository) private boardRepository: BoardRepository,
   ) {}
-  // private boards: Board[] = [];
-  // getAllBoards(): Board[] {
-  //   return this.boards;
-  // }
 
-  createBoard(createBoardDto: CreateBoardDto) {
+  async getAllBoards(): Promise<Board[]> {
+    return this.boardRepository.find();
+  }
+
+  async createBoard(createBoardDto: CreateBoardDto) {
     return this.boardRepository.createBoard(createBoardDto);
   }
 
