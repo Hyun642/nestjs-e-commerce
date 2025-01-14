@@ -12,8 +12,8 @@ export class BoardsService {
     @InjectRepository(BoardRepository) private boardRepository: BoardRepository,
   ) {}
 
-  async getAllBoards(): Promise<Board[]> {
-    return this.boardRepository.find();
+  async getAllBoards(user: User): Promise<Board[]> {
+    return this.boardRepository.find({ where: { user: { id: user.id } } });
   }
 
   async createBoard(createBoardDto: CreateBoardDto, user: User) {
