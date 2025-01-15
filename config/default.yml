@@ -5,6 +5,11 @@ db:
   type: 'postgres'
   port: 5432
   database: 'board-app'
+  host: 'localhost'
+  username: 'postgres'
+  password: '1234'
+  synchronize: true
 
 jwt:
   expiresIn: 3600
+  secret: 'Secret1234'
