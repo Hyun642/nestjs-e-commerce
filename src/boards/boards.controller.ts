@@ -42,21 +42,22 @@ export class BoardsController {
   }
 
   @Get('/:id')
-  getBoardById(@Param('id') id: number): Promise<Board> {
+  getBoardById(@Param('id', ParseIntPipe) id: number): Promise<Board> {
     return this.boardService.getBoardById(id);
   }
 
   @Delete('/:id')
-  deleteBoard(
+  async deleteBoard(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
-  ): Promise<void> {
-    return this.boardService.deleteBoard(id, user);
+  ): Promise<{ message: string }> {
+    await this.boardService.deleteBoard(id, user);
+    return { message: 'Board delete successfully' };
   }
 
   @Patch('/:id/status')
   updateBoardStatus(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body('status', BoardStatusValidationPipe) status: BoardStatus,
   ): Promise<Board> {
     return this.boardService.updateBoardStatus(id, status);
