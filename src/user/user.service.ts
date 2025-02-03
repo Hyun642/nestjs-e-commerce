@@ -12,7 +12,7 @@ export class UserService {
     return res;
   }
 
-  async logIn(input: LogInDto) {
+  async logIn(input: LogInDto): Promise<{ accessToken: string }> {
     return await this.userRepository.logIn(input);
     // throw new NotFoundException(
     //   `not exist email: ${email}, password: ${password}`,

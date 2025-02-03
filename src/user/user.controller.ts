@@ -12,7 +12,7 @@ export class UserController {
   }
 
   @Post('/login')
-  async logIn(@Body() input: LogInDto) {
+  async logIn(@Body() input: LogInDto): Promise<{ accessToken: string }> {
     return await this.userService.logIn(input);
   }
 
