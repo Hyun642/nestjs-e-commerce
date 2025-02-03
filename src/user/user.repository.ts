@@ -1,8 +1,12 @@
-import { ConflictException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { SignUpDto } from './dto/signup.dto';
 import * as bcrypt from 'bcrypt';
+import { LogInDto } from './dto/login.dto';
 
 @Injectable()
 export class UserRepository {
@@ -28,6 +32,18 @@ export class UserRepository {
       },
     });
     return res;
+  }
+
+  async logIn(input: LogInDto): Promise<string> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: input.email },
+    });
+    if (user && (await bcrypt.compare(input.password, user.password))) {
+      return '로그인 성공';
+    }
+    throw new UnauthorizedException(
+      '이메일 혹은 비밀번호가 일치하지 않거나 존재하지 않습니다.',
+    );
   }
 
   // async findAllUser(): Promise<any> {

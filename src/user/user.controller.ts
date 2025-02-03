@@ -1,6 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignUpDto } from './dto/signup.dto';
+import { LogInDto } from './dto/login.dto';
 
 @Controller('user')
 export class UserController {
@@ -10,10 +11,10 @@ export class UserController {
     return await this.userService.signUp(user);
   }
 
-  // @Post('login')
-  // login(@Body('email') email: string, @Body('password') password: string) {
-  //   return this.userService.login(email, password);
-  // }
+  @Post('/login')
+  async logIn(@Body() input: LogInDto) {
+    return await this.userService.logIn(input);
+  }
 
   // @Get('findAllUser')
   // findAllUser() {

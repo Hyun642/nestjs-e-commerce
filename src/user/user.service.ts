@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { SignUpDto } from './dto/signup.dto';
+import { LogInDto } from './dto/login.dto';
 
 @Injectable()
 export class UserService {
@@ -11,15 +12,14 @@ export class UserService {
     return res;
   }
 
+  async logIn(input: LogInDto) {
+    return await this.userRepository.logIn(input);
+    // throw new NotFoundException(
+    //   `not exist email: ${email}, password: ${password}`,
+    // );
+  }
+
   // async findAllUser() {
   //   return await this.userRepository.findAllUser();
   // }
-  //   login(email: string, password: string): string {
-  //     if (this.user[0]) {
-  //       return 'good';
-  //     }
-  //     throw new NotFoundException(
-  //       `not exist email: ${email}, password: ${password}`,
-  //     );
-  //   }
 }
