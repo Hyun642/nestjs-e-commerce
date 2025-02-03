@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignUpDto } from './dto/signup.dto';
 
@@ -6,8 +6,8 @@ import { SignUpDto } from './dto/signup.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
   @Post('/signup')
-  signUp(@Body() signUpDto: SignUpDto): Promise<boolean> {
-    return this.userService.signUp(signUpDto);
+  async signUp(@Body() user: SignUpDto): Promise<SignUpDto> {
+    return await this.userService.signUp(user);
   }
 
   // @Post('login')

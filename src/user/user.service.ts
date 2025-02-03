@@ -5,11 +5,10 @@ import { SignUpDto } from './dto/signup.dto';
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
-  private user = [];
 
-  async signUp(signUpDto: SignUpDto): Promise<boolean> {
-    const isCreated = await this.userRepository.signUp(signUpDto);
-    return isCreated;
+  async signUp(user: SignUpDto): Promise<SignUpDto> {
+    const res = await this.userRepository.signUp(user);
+    return res;
   }
 
   // async findAllUser() {
