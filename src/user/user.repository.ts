@@ -44,15 +44,11 @@ export class UserRepository {
     });
     if (user && (await bcrypt.compare(input.password, user.password))) {
       const payload = input.email;
-      const accessToken = this.jwtService.sign({ payload });
+      const accessToken = this.jwtService.sign({ email: payload });
       return { accessToken };
     }
     throw new UnauthorizedException(
       '이메일 혹은 비밀번호가 일치하지 않거나 존재하지 않습니다.',
     );
   }
-
-  // async findAllUser(): Promise<any> {
-  //   return this.prisma.user.findMany();
-  // }
 }

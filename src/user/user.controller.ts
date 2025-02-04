@@ -1,7 +1,15 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LogInDto } from './dto/login.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
@@ -16,8 +24,12 @@ export class UserController {
     return await this.userService.logIn(input);
   }
 
-  // @Get('findAllUser')
-  // findAllUser() {
-  //   return this.userService.findAllUser();
-  // }
+  @Post('/sendtokentest')
+  @UseGuards(AuthGuard())
+  sendtokentest(@Req() req) {
+    if (!req.user) {
+      throw new UnauthorizedException('토큰이 유효하지 않습니다.');
+    }
+    return req.user;
+  }
 }

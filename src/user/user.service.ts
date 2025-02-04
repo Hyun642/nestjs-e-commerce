@@ -14,12 +14,5 @@ export class UserService {
 
   async logIn(input: LogInDto): Promise<{ accessToken: string }> {
     return await this.userRepository.logIn(input);
-    // throw new NotFoundException(
-    //   `not exist email: ${email}, password: ${password}`,
-    // );
   }
-
-  // async findAllUser() {
-  //   return await this.userRepository.findAllUser();
-  // }
 }
