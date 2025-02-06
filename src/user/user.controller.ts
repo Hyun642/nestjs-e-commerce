@@ -27,9 +27,6 @@ export class UserController {
   @Post('/sendtokentest')
   @UseGuards(AuthGuard())
   sendtokentest(@Req() req) {
-    if (!req.user) {
-      throw new UnauthorizedException('토큰이 유효하지 않습니다.');
-    }
     return req.user;
   }
 }
