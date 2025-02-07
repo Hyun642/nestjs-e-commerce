@@ -9,9 +9,9 @@ import {
 import { UserService } from './user.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LogInDto } from './dto/login.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './get-user.decorator';
 import { User } from '@prisma/client';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -27,7 +27,7 @@ export class UserController {
   }
 
   @Post('/sendtokentest')
-  @UseGuards(AuthGuard())
+  @UseGuards(JwtAuthGuard)
   sendtokentest(@GetUser() user: User) {
     return user;
   }

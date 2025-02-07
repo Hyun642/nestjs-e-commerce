@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { UserRepository } from './user.repository';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from '../auth/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
@@ -16,6 +16,6 @@ import { PassportModule } from '@nestjs/passport';
       signOptions: { expiresIn: 60 * 60 },
     }),
   ],
-  exports: [JwtStrategy, PassportModule],
+  exports: [JwtStrategy],
 })
 export class UserModule {}
