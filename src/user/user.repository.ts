@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 export class UserRepository {
   constructor(
     private readonly prisma: PrismaService,
-    private jwtService: JwtService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async signUp(user: SignUpDto): Promise<SignUpDto> {
@@ -43,8 +43,8 @@ export class UserRepository {
       where: { email: input.email },
     });
     if (user && (await bcrypt.compare(input.password, user.password))) {
-      const payload = input.email;
-      const accessToken = this.jwtService.sign({ email: payload });
+      const payload = user.id;
+      const accessToken = this.jwtService.sign({ id: payload });
       return { accessToken };
     }
     throw new UnauthorizedException(
