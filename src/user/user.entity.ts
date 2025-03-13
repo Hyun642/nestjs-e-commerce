@@ -4,11 +4,11 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  IsDate,
   MinLength,
   MaxLength,
   IsNotEmpty,
   Matches,
+  IsDateString,
 } from 'class-validator';
 
 export class UserEntity {
@@ -47,17 +47,17 @@ export class UserEntity {
   @ApiProperty({ description: '번호', example: '01012345678' })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d{10,15}$/, {
+  @Matches(/^\d{10,11}$/, {
     message: 'Phone number must be 10 to 15 digits',
   })
   phoneNumber: string;
 
   @ApiProperty({ description: '생성일시', example: '2025-02-12T02:00:00.000Z' })
-  @IsDate()
+  @IsDateString()
   createdAt: Date;
 
   @ApiProperty({ description: '수정일시', example: '2025-02-12T03:00:00.000Z' })
-  @IsDate()
+  @IsDateString()
   updatedAt: Date;
 
   @ApiProperty({
@@ -66,6 +66,6 @@ export class UserEntity {
     required: false,
   })
   @IsOptional()
-  @IsDate()
+  @IsDateString()
   deletedAt?: Date;
 }
