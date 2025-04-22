@@ -10,8 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { LogInDto } from '../dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
-import { DeleteUserAddressDto } from '../dto/address/deleteUserAddress.dto';
-import { UserAddressEntity } from '../dto/address/userAddress.entity';
+import { UserAddressEntity } from '../userAddress.entity';
 
 @Injectable()
 export class UserRepository {

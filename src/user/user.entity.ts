@@ -9,7 +9,7 @@ import {
   Matches,
   IsDateString,
 } from 'class-validator';
-import { UserAddressEntity } from './dto/address/userAddress.entity';
+import { UserAddressEntity } from './userAddress.entity';
 
 export class UserEntity {
   @ApiProperty({ description: '사용자 고유 ID', example: 1 })
