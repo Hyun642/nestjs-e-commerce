@@ -5,6 +5,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignUpDto } from './dto/signup.dto';
@@ -16,6 +17,7 @@ import { ApiResponse } from '@nestjs/swagger';
 import { CreateUserAddressDto } from './dto/address/createUserAddress.dto';
 import { DeleteUserAddressDto } from './dto/address/deleteUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
+import { UserAddressEntity } from './dto/address/userAddress.entity';
 
 @Controller('user')
 export class UserController {
@@ -71,5 +73,13 @@ export class UserController {
       result: 'Success',
       statusCode: 200,
     };
+  }
+
+  @Get('/getUserAddressById')
+  @UseGuards(JwtAuthGuard)
+  async getUserAddressById(
+    @GetUser() user: User,
+  ): Promise<UserAddressEntity[]> {
+    return await this.userService.getUserAddressById(user.id);
   }
 }

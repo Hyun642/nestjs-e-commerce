@@ -94,4 +94,12 @@ export class UserRepository {
       },
     });
   }
+
+  async getUserAddressById(userId: string): Promise<UserAddressEntity[]> {
+    return await this.prisma.userAddress.findMany({
+      where: {
+        userId,
+      },
+    });
+  }
 }

@@ -3,6 +3,7 @@ import { UserRepository } from './user.repository';
 import { SignUpDto } from './dto/signup.dto';
 import { LogInDto } from './dto/login.dto';
 import { CreateUserAddressDto } from './dto/address/createUserAddress.dto';
+import { UserAddressEntity } from './dto/address/userAddress.entity';
 
 @Injectable()
 export class UserService {
@@ -29,5 +30,9 @@ export class UserService {
     userId: string,
   ): Promise<void> {
     await this.userRepository.deleteUserAddress(userAddressId, userId);
+  }
+
+  async getUserAddressById(userId: string): Promise<UserAddressEntity[]> {
+    return await this.userRepository.getUserAddressById(userId);
   }
 }
