@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
@@ -8,6 +9,9 @@ import { SignUpDto } from './dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import { LogInDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserAddressDto } from './dto/address/createUserAddress.dto';
+import { DeleteUserAddressDto } from './dto/address/deleteUserAddress.dto';
+import { UserAddressEntity } from './dto/address/userAddress.entity';
 
 @Injectable()
 export class UserRepository {
@@ -50,5 +54,44 @@ export class UserRepository {
     throw new UnauthorizedException(
       '이메일 혹은 비밀번호가 일치하지 않거나 존재하지 않습니다.',
     );
+  }
+
+  async createUserAddress(
+    userAddress: CreateUserAddressDto,
+    userId: string,
+  ): Promise<void> {
+    await this.prisma.userAddress.create({
+      data: {
+        name: userAddress.name,
+        address: userAddress.address,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteUserAddress(
+    userAddressId: number,
+    userId: string,
+  ): Promise<void> {
+    const info = await this.prisma.userAddress.findFirst({
+      where: {
+        id: userAddressId,
+        userId: userId,
+      },
+    });
+
+    if (!info) {
+      throw new NotFoundException('존재하지 않거나 접근 권한이 없습니다.');
+    }
+
+    await this.prisma.userAddress.delete({
+      where: {
+        id: userAddressId,
+      },
+    });
   }
 }

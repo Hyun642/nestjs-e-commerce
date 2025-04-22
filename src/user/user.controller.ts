@@ -1,4 +1,11 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LogInDto } from './dto/login.dto';
@@ -6,6 +13,9 @@ import { GetUser } from './get-user.decorator';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiResponse } from '@nestjs/swagger';
+import { CreateUserAddressDto } from './dto/address/createUserAddress.dto';
+import { DeleteUserAddressDto } from './dto/address/deleteUserAddress.dto';
+import { DefaultResponseDto } from 'src/common/dto/response.dto';
 
 @Controller('user')
 export class UserController {
@@ -28,5 +38,38 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   sendtokentest(@GetUser() user: User) {
     return user;
+  }
+
+  @ApiResponse({ status: HttpStatus.CREATED, description: '주소 등록 성공' })
+  @Post('/createUserAddress')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async createUserAddress(
+    @Body() userAddress: CreateUserAddressDto,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    const userId = user.id;
+    await this.userService.createUserAddress(userAddress, userId);
+    return {
+      message: '주소 등록 성공',
+      result: 'Success',
+      statusCode: 201,
+    };
+  }
+
+  @ApiResponse({ status: HttpStatus.OK, description: '주소 삭제 성공' })
+  @Post('/deleteUserAddress')
+  @UseGuards(JwtAuthGuard)
+  async deleteUserAddress(
+    @Body() body: DeleteUserAddressDto,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    const userId = user.id;
+    await this.userService.deleteUserAddress(body.userAddressId, userId);
+    return {
+      message: '주소 삭제 성공',
+      result: 'Success',
+      statusCode: 200,
+    };
   }
 }
