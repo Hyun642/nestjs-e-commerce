@@ -7,17 +7,17 @@ import {
   HttpStatus,
   Get,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { SignUpDto } from './dto/signup.dto';
-import { LogInDto } from './dto/login.dto';
-import { GetUser } from './get-user.decorator';
+import { UserService } from '../service/user.service';
+import { SignUpDto } from '../dto/signup.dto';
+import { LogInDto } from '../dto/login.dto';
+import { GetUser } from '../get-user.decorator';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiResponse } from '@nestjs/swagger';
-import { CreateUserAddressDto } from './dto/address/createUserAddress.dto';
-import { DeleteUserAddressDto } from './dto/address/deleteUserAddress.dto';
+import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
+import { DeleteUserAddressDto } from '../dto/address/deleteUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
-import { UserAddressEntity } from './dto/address/userAddress.entity';
+import { UserAddressEntity } from '../dto/address/userAddress.entity';
 
 @Controller('user')
 export class UserController {

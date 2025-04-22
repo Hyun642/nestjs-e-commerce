@@ -5,13 +5,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
-import { SignUpDto } from './dto/signup.dto';
+import { SignUpDto } from '../dto/signup.dto';
 import * as bcrypt from 'bcrypt';
-import { LogInDto } from './dto/login.dto';
+import { LogInDto } from '../dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserAddressDto } from './dto/address/createUserAddress.dto';
-import { DeleteUserAddressDto } from './dto/address/deleteUserAddress.dto';
-import { UserAddressEntity } from './dto/address/userAddress.entity';
+import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
+import { DeleteUserAddressDto } from '../dto/address/deleteUserAddress.dto';
+import { UserAddressEntity } from '../dto/address/userAddress.entity';
 
 @Injectable()
 export class UserRepository {
