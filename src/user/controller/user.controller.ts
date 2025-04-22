@@ -13,7 +13,7 @@ import { LogInDto } from '../dto/login.dto';
 import { GetUser } from '../get-user.decorator';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
 import { DeleteUserAddressDto } from '../dto/address/deleteUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
@@ -42,6 +42,7 @@ export class UserController {
     return user;
   }
 
+  @ApiBearerAuth('access-token')
   @ApiResponse({ status: HttpStatus.CREATED, description: '주소 등록 성공' })
   @Post('/createUserAddress')
   @UseGuards(JwtAuthGuard)
@@ -60,6 +61,7 @@ export class UserController {
   }
 
   @ApiResponse({ status: HttpStatus.OK, description: '주소 삭제 성공' })
+  @ApiBearerAuth('access-token')
   @Post('/deleteUserAddress')
   @UseGuards(JwtAuthGuard)
   async deleteUserAddress(
@@ -75,6 +77,8 @@ export class UserController {
     };
   }
 
+  @ApiResponse({ status: HttpStatus.OK, description: '주소 조회 성공' })
+  @ApiBearerAuth('access-token')
   @Get('/getUserAddressById')
   @UseGuards(JwtAuthGuard)
   async getUserAddressById(
