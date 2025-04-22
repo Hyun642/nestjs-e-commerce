@@ -1,7 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
-  IsInt,
   IsOptional,
   IsString,
   MinLength,
@@ -10,11 +9,12 @@ import {
   Matches,
   IsDateString,
 } from 'class-validator';
+import { UserAddressEntity } from './dto/address/userAddress.entity';
 
 export class UserEntity {
   @ApiProperty({ description: '사용자 고유 ID', example: 1 })
-  @IsInt()
-  id: number;
+  @IsString()
+  id: string;
 
   @ApiProperty({ description: '사용자 이메일', example: 'user@example.com' })
   @IsString()
@@ -32,6 +32,7 @@ export class UserEntity {
   @MinLength(4)
   @MaxLength(10)
   @IsNotEmpty()
+  @ApiHideProperty()
   @Matches(/^[a-zA-Z0-9]*$/, {
     message: 'password only accepts Eng and Number',
     //영문과 숫자
@@ -68,4 +69,8 @@ export class UserEntity {
   @IsOptional()
   @IsDateString()
   deletedAt?: Date;
+
+  @ApiProperty({ type: () => [UserAddressEntity], required: false })
+  @IsOptional()
+  userAddress: UserAddressEntity[];
 }
