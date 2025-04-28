@@ -35,4 +35,11 @@ export class UserService {
   async getUserAddressById(userId: string): Promise<UserAddressEntity[]> {
     return await this.userRepository.getUserAddressById(userId);
   }
+
+  async createBusinessLicense(
+    businessId: string,
+    userId: string,
+  ): Promise<void> {
+    await this.userRepository.createBusinessLicense(businessId, userId);
+  }
 }

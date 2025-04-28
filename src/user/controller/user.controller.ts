@@ -13,11 +13,12 @@ import { LogInDto } from '../dto/login.dto';
 import { GetUser } from '../get-user.decorator';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
 import { DeleteUserAddressDto } from '../dto/address/deleteUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { UserAddressEntity } from '../userAddress.entity';
+import { BusinessLicenseDto } from '../dto/businessLicense/businessLicense.dto';
 
 @Controller('user')
 export class UserController {
@@ -73,7 +74,7 @@ export class UserController {
     return {
       message: '주소 삭제 성공',
       result: 'Success',
-      statusCode: 200,
+      statusCode: HttpStatus.OK,
     };
   }
 
@@ -85,5 +86,27 @@ export class UserController {
     @GetUser() user: User,
   ): Promise<UserAddressEntity[]> {
     return await this.userService.getUserAddressById(user.id);
+  }
+
+  @ApiResponse({ status: HttpStatus.CREATED, description: '주소 등록 성공' })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: '사업자 등록 번호 누락',
+  })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: '인증 실패' })
+  @ApiBearerAuth('access-token')
+  @ApiBody({ type: BusinessLicenseDto })
+  @Post('/createBusinessLicense')
+  @UseGuards(JwtAuthGuard)
+  async createBusinessLicense(
+    @Body() body: BusinessLicenseDto,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.userService.createBusinessLicense(body.businessId, user.id);
+    return {
+      message: '[사업자 등록 정보] 등록 성공',
+      result: 'success',
+      statusCode: HttpStatus.CREATED,
+    };
   }
 }

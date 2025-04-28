@@ -14,10 +14,12 @@ export class BusinessLicenseEntity {
   @IsString()
   businessId: string;
 
+  @ApiProperty({ description: '삭제일자', required: false })
   @IsOptional()
   @IsDateString()
   deletedAt: Date;
 
+  @ApiProperty({ description: '사업자등록번호', required: false })
   @IsOptional()
   @IsDateString()
   createdAt: Date;

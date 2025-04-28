@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -98,6 +99,34 @@ export class UserRepository {
     return await this.prisma.userAddress.findMany({
       where: {
         userId,
+      },
+    });
+  }
+
+  async createBusinessLicense(
+    businessId: string,
+    userId: string,
+  ): Promise<void> {
+    if (!businessId) {
+      throw new BadRequestException('사업자 등록 번호를 입력해주세요.');
+    }
+    const exists = await this.prisma.businessLicense.findFirst({
+      where: {
+        userId: userId,
+        businessId: businessId,
+      },
+    });
+    if (exists) {
+      throw new ConflictException('이미 등록된 사업자번호입니다.');
+    }
+    await this.prisma.businessLicense.create({
+      data: {
+        businessId: businessId,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
       },
     });
   }
