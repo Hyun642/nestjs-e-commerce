@@ -109,4 +109,14 @@ export class UserController {
       statusCode: HttpStatus.CREATED,
     };
   }
+
+  @ApiResponse({ status: HttpStatus.OK, description: '사업자 정보 반환 성공' })
+  @ApiBearerAuth('access-token')
+  @Get('/getUserBusinessLicense')
+  @UseGuards(JwtAuthGuard)
+  async getUserBusinessLicense(
+    @GetUser() user: User,
+  ): Promise<{ businessId: string; createdAt: Date }[]> {
+    return await this.userService.getUserBusinessLicense(user.id);
+  }
 }

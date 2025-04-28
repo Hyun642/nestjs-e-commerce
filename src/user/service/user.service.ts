@@ -42,4 +42,10 @@ export class UserService {
   ): Promise<void> {
     await this.userRepository.createBusinessLicense(businessId, userId);
   }
+
+  async getUserBusinessLicense(
+    userId: string,
+  ): Promise<{ businessId: string; createdAt: Date }[]> {
+    return await this.userRepository.getUserBusinessLicense(userId);
+  }
 }

@@ -130,4 +130,20 @@ export class UserRepository {
       },
     });
   }
+
+  async getUserBusinessLicense(
+    userId: string,
+  ): Promise<{ businessId: string; createdAt: Date }[]> {
+    const info = await this.prisma.businessLicense.findMany({
+      where: {
+        userId: userId,
+        deletedAt: null,
+      },
+      select: {
+        businessId: true,
+        createdAt: true,
+      },
+    });
+    return info;
+  }
 }
