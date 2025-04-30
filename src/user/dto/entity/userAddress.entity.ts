@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 
 export class UserAddressEntity {
   @ApiProperty({ description: '주소 ID', example: 1 })
@@ -20,13 +20,4 @@ export class UserAddressEntity {
   })
   @IsString()
   address: string;
-
-  @ApiProperty({
-    description: '삭제 일시',
-    example: '2025-04-21T10:00:00.000Z',
-    required: false,
-  })
-  @IsOptional()
-  @IsDateString()
-  deletedAt: Date;
 }
