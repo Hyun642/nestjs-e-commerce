@@ -6,6 +6,8 @@ import {
   HttpCode,
   HttpStatus,
   Get,
+  Delete,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { SignUpDto } from '../dto/signup.dto';
@@ -17,7 +19,8 @@ import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
 import { DeleteUserAddressDto } from '../dto/address/deleteUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
-import { UserAddressEntity } from '../userAddress.entity';
+import { UserAddressEntity } from '../dto/entity/userAddress.entity';
+import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
 
 @Controller('user')
 export class UserController {
@@ -62,14 +65,15 @@ export class UserController {
 
   @ApiResponse({ status: HttpStatus.OK, description: '주소 삭제 성공' })
   @ApiBearerAuth('access-token')
-  @Post('/deleteUserAddress')
+  @Delete('/deleteUserAddress')
   @UseGuards(JwtAuthGuard)
   async deleteUserAddress(
     @Body() body: DeleteUserAddressDto,
     @GetUser() user: User,
   ): Promise<DefaultResponseDto> {
     const userId = user.id;
-    await this.userService.deleteUserAddress(body.userAddressId, userId);
+    const userAddressId = body.id;
+    await this.userService.deleteUserAddress(userAddressId, userId);
     return {
       message: '주소 삭제 성공',
       result: 'Success',
@@ -85,5 +89,21 @@ export class UserController {
     @GetUser() user: User,
   ): Promise<UserAddressEntity[]> {
     return await this.userService.getUserAddressById(user.id);
+  }
+
+  @ApiResponse({ status: HttpStatus.OK, description: '주소 변경 성공' })
+  @ApiBearerAuth('access-token')
+  @Patch('/updateUserAddressById')
+  @UseGuards(JwtAuthGuard)
+  async updateUserAddressById(
+    @Body() body: UpdateUserAddressDto,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.userService.updateUserAddressById(body, user.id);
+    return {
+      message: '주소 변경 성공',
+      result: 'updated',
+      statusCode: 200,
+    };
   }
 }

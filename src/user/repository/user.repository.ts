@@ -10,7 +10,8 @@ import * as bcrypt from 'bcrypt';
 import { LogInDto } from '../dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
-import { UserAddressEntity } from '../userAddress.entity';
+import { UserAddressEntity } from '../dto/entity/userAddress.entity';
+import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
 
 @Injectable()
 export class UserRepository {
@@ -98,6 +99,33 @@ export class UserRepository {
     return await this.prisma.userAddress.findMany({
       where: {
         userId,
+      },
+    });
+  }
+
+  async updateUserAddressById(
+    body: UpdateUserAddressDto,
+    userId: string,
+  ): Promise<void> {
+    const info = await this.prisma.userAddress.findFirst({
+      where: {
+        userId,
+        id: body.id,
+        deletedAt: null,
+      },
+    });
+    if (!info) {
+      throw new NotFoundException('존재하지 않거나 접근 권한이 없습니다.');
+    }
+
+    await this.prisma.userAddress.updateMany({
+      where: {
+        userId,
+        id: body.id,
+      },
+      data: {
+        name: body.name,
+        address: body.address,
       },
     });
   }
