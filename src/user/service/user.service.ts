@@ -48,4 +48,8 @@ export class UserService {
   ): Promise<{ businessId: string; createdAt: Date }[]> {
     return await this.userRepository.getUserBusinessLicense(userId);
   }
+
+  async deleteUserBusinessLicense(id: number, userId: string): Promise<void> {
+    return await this.userRepository.deleteUserBusinessLicense(id, userId);
+  }
 }

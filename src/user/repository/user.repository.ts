@@ -146,4 +146,31 @@ export class UserRepository {
     });
     return info;
   }
+
+  async deleteUserBusinessLicense(id: number, userId: string): Promise<void> {
+    const info = await this.prisma.businessLicense.findFirst({
+      where: {
+        userId: userId,
+        id: id,
+        deletedAt: null,
+      },
+    });
+    if (!info) {
+      throw new NotFoundException('삭제할 사업자 등록번호를 찾을 수 없습니다.');
+    }
+
+    const result = await this.prisma.businessLicense.updateMany({
+      where: {
+        id: id,
+        userId: userId,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    if (result.count === 0) {
+      throw new NotFoundException('삭제할 사업자 등록번호를 찾을 수 없습니다.');
+    }
+  }
 }

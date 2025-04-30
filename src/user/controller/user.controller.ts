@@ -6,6 +6,9 @@ import {
   HttpCode,
   HttpStatus,
   Get,
+  Param,
+  Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { SignUpDto } from '../dto/signup.dto';
@@ -118,5 +121,21 @@ export class UserController {
     @GetUser() user: User,
   ): Promise<{ businessId: string; createdAt: Date }[]> {
     return await this.userService.getUserBusinessLicense(user.id);
+  }
+
+  @ApiResponse({ status: HttpStatus.OK, description: '사업자 정보 삭제 성공' })
+  @ApiBearerAuth('access-token')
+  @Delete('/deleteUserBusinessLicense/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteUserBusinessLicense(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.userService.deleteUserBusinessLicense(id, user.id);
+    return {
+      message: '[사업자 등록 정보] 제거 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+    };
   }
 }
