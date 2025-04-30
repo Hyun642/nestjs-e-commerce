@@ -81,16 +81,21 @@ export class UserRepository {
       where: {
         id: userAddressId,
         userId: userId,
+        deletedAt: null,
       },
     });
 
     if (!info) {
-      throw new NotFoundException('존재하지 않거나 접근 권한이 없습니다.');
+      throw new NotFoundException('삭제되었거나 존재하지 않습니다.');
     }
 
-    await this.prisma.userAddress.delete({
+    await this.prisma.userAddress.updateMany({
       where: {
+        userId,
         id: userAddressId,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }

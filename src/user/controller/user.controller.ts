@@ -8,6 +8,8 @@ import {
   Get,
   Delete,
   Patch,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { SignUpDto } from '../dto/signup.dto';
@@ -65,15 +67,13 @@ export class UserController {
 
   @ApiResponse({ status: HttpStatus.OK, description: '주소 삭제 성공' })
   @ApiBearerAuth('access-token')
-  @Delete('/deleteUserAddress')
+  @Delete('/deleteUserAddress/:id')
   @UseGuards(JwtAuthGuard)
   async deleteUserAddress(
-    @Body() body: DeleteUserAddressDto,
+    @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
   ): Promise<DefaultResponseDto> {
-    const userId = user.id;
-    const userAddressId = body.id;
-    await this.userService.deleteUserAddress(userAddressId, userId);
+    await this.userService.deleteUserAddress(id, user.id);
     return {
       message: '주소 삭제 성공',
       result: 'Success',
