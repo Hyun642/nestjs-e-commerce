@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -106,6 +107,77 @@ export class UserRepository {
         userId,
       },
     });
+  }
+
+  async createBusinessLicense(
+    businessId: string,
+    userId: string,
+  ): Promise<void> {
+    if (!businessId) {
+      throw new BadRequestException('사업자 등록 번호를 입력해주세요.');
+    }
+    const exists = await this.prisma.businessLicense.findFirst({
+      where: {
+        userId: userId,
+        businessId: businessId,
+      },
+    });
+    if (exists) {
+      throw new ConflictException('이미 등록된 사업자번호입니다.');
+    }
+    await this.prisma.businessLicense.create({
+      data: {
+        businessId: businessId,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+  }
+
+  async getUserBusinessLicense(
+    userId: string,
+  ): Promise<{ businessId: string; createdAt: Date }[]> {
+    const info = await this.prisma.businessLicense.findMany({
+      where: {
+        userId: userId,
+        deletedAt: null,
+      },
+      select: {
+        businessId: true,
+        createdAt: true,
+      },
+    });
+    return info;
+  }
+
+  async deleteUserBusinessLicense(id: number, userId: string): Promise<void> {
+    const info = await this.prisma.businessLicense.findFirst({
+      where: {
+        userId: userId,
+        id: id,
+        deletedAt: null,
+      },
+    })
+    if (!info) {
+      throw new NotFoundException('삭제할 사업자 등록번호를 찾을 수 없습니다.');
+    }
+
+    const result = await this.prisma.businessLicense.updateMany({
+      where: {
+        id: id,
+        userId: userId,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    if (result.count === 0) {
+      throw new NotFoundException('삭제할 사업자 등록번호를 찾을 수 없습니다.');
+    }
   }
 
   async updateUserAddressById(

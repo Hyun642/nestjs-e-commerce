@@ -36,11 +36,28 @@ export class UserService {
   async getUserAddressById(userId: string): Promise<UserAddressEntity[]> {
     return await this.userRepository.getUserAddressById(userId);
   }
-
+    
   async updateUserAddressById(
     body: UpdateUserAddressDto,
     userId: string,
   ): Promise<void> {
     return await this.userRepository.updateUserAddressById(body, userId);
   }
+  
+  async createBusinessLicense(
+    businessId: string,
+    userId: string,
+  ): Promise<void> {
+    await this.userRepository.createBusinessLicense(businessId, userId);
+  }
+
+  async getUserBusinessLicense(
+    userId: string,
+  ): Promise<{ businessId: string; createdAt: Date }[]> {
+    return await this.userRepository.getUserBusinessLicense(userId);
+  }
+
+  async deleteUserBusinessLicense(id: number, userId: string): Promise<void> {
+    return await this.userRepository.deleteUserBusinessLicense(id, userId);
+   }
 }
