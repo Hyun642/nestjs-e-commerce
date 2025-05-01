@@ -6,8 +6,9 @@ import {
   HttpCode,
   HttpStatus,
   Get,
-  Param,
   Delete,
+  Patch,
+  Param,
   ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from '../service/user.service';
@@ -20,8 +21,9 @@ import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
 import { DeleteUserAddressDto } from '../dto/address/deleteUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
-import { UserAddressEntity } from '../userAddress.entity';
 import { BusinessLicenseDto } from '../dto/businessLicense/businessLicense.dto';
+import { UserAddressEntity } from '../dto/entity/userAddress.entity';
+import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
 
 @Controller('user')
 export class UserController {
@@ -66,14 +68,13 @@ export class UserController {
 
   @ApiResponse({ status: HttpStatus.OK, description: '주소 삭제 성공' })
   @ApiBearerAuth('access-token')
-  @Post('/deleteUserAddress')
+  @Delete('/deleteUserAddress/:id')
   @UseGuards(JwtAuthGuard)
   async deleteUserAddress(
-    @Body() body: DeleteUserAddressDto,
+    @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
   ): Promise<DefaultResponseDto> {
-    const userId = user.id;
-    await this.userService.deleteUserAddress(body.userAddressId, userId);
+    await this.userService.deleteUserAddress(id, user.id);
     return {
       message: '주소 삭제 성공',
       result: 'Success',
@@ -90,8 +91,24 @@ export class UserController {
   ): Promise<UserAddressEntity[]> {
     return await this.userService.getUserAddressById(user.id);
   }
+  
+  @ApiResponse({ status: HttpStatus.OK, description: '주소 변경 성공' })
+  @ApiBearerAuth('access-token')
+  @Patch('/updateUserAddressById')
+  @UseGuards(JwtAuthGuard)
+  async updateUserAddressById(
+    @Body() body: UpdateUserAddressDto,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.userService.updateUserAddressById(body, user.id);
+    return {
+      message: '주소 변경 성공',
+      result: 'updated',
+      statusCode: 200,
+    };
+  }
 
-  @ApiResponse({ status: HttpStatus.CREATED, description: '주소 등록 성공' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: '사업자 등록 성공' })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: '사업자 등록 번호 누락',
@@ -136,6 +153,6 @@ export class UserController {
       message: '[사업자 등록 정보] 제거 성공',
       result: 'success',
       statusCode: HttpStatus.OK,
-    };
+     };
   }
 }

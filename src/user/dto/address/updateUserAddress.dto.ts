@@ -1,7 +1,8 @@
 import { PickType } from '@nestjs/swagger';
 import { UserAddressEntity } from '../entity/userAddress.entity';
 
-export class CreateUserAddressDto extends PickType(UserAddressEntity, [
+export class UpdateUserAddressDto extends PickType(UserAddressEntity, [
+  'id',
   'name',
   'address',
 ]) {}

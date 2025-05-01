@@ -11,7 +11,8 @@ import * as bcrypt from 'bcrypt';
 import { LogInDto } from '../dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
-import { UserAddressEntity } from '../userAddress.entity';
+import { UserAddressEntity } from '../dto/entity/userAddress.entity';
+import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
 
 @Injectable()
 export class UserRepository {
@@ -81,16 +82,21 @@ export class UserRepository {
       where: {
         id: userAddressId,
         userId: userId,
+        deletedAt: null,
       },
     });
 
     if (!info) {
-      throw new NotFoundException('존재하지 않거나 접근 권한이 없습니다.');
+      throw new NotFoundException('삭제되었거나 존재하지 않습니다.');
     }
 
-    await this.prisma.userAddress.delete({
+    await this.prisma.userAddress.updateMany({
       where: {
+        userId,
         id: userAddressId,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }
@@ -154,7 +160,7 @@ export class UserRepository {
         id: id,
         deletedAt: null,
       },
-    });
+    })
     if (!info) {
       throw new NotFoundException('삭제할 사업자 등록번호를 찾을 수 없습니다.');
     }
@@ -172,5 +178,32 @@ export class UserRepository {
     if (result.count === 0) {
       throw new NotFoundException('삭제할 사업자 등록번호를 찾을 수 없습니다.');
     }
+  }
+
+  async updateUserAddressById(
+    body: UpdateUserAddressDto,
+    userId: string,
+  ): Promise<void> {
+    const info = await this.prisma.userAddress.findFirst({
+      where: {
+        userId,
+        id: body.id,
+        deletedAt: null,
+      },
+    });
+    if (!info) {
+      throw new NotFoundException('존재하지 않거나 접근 권한이 없습니다.');
+    }
+
+    await this.prisma.userAddress.updateMany({
+      where: {
+        userId,
+        id: body.id,
+      },
+      data: {
+        name: body.name,
+        address: body.address,
+      },
+    });
   }
 }

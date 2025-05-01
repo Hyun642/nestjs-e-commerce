@@ -3,7 +3,8 @@ import { UserRepository } from '../repository/user.repository';
 import { SignUpDto } from '../dto/signup.dto';
 import { LogInDto } from '../dto/login.dto';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
-import { UserAddressEntity } from '../userAddress.entity';
+import { UserAddressEntity } from '../dto/entity/userAddress.entity';
+import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
 
 @Injectable()
 export class UserService {
@@ -35,7 +36,14 @@ export class UserService {
   async getUserAddressById(userId: string): Promise<UserAddressEntity[]> {
     return await this.userRepository.getUserAddressById(userId);
   }
-
+    
+  async updateUserAddressById(
+    body: UpdateUserAddressDto,
+    userId: string,
+  ): Promise<void> {
+    return await this.userRepository.updateUserAddressById(body, userId);
+  }
+  
   async createBusinessLicense(
     businessId: string,
     userId: string,
@@ -51,5 +59,5 @@ export class UserService {
 
   async deleteUserBusinessLicense(id: number, userId: string): Promise<void> {
     return await this.userRepository.deleteUserBusinessLicense(id, userId);
-  }
+   }
 }
