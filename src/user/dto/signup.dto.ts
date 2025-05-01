@@ -1,5 +1,5 @@
 import { PickType } from '@nestjs/swagger';
-import { UserEntity } from '../user.entity';
+import { UserEntity } from './entity/user.entity';
 
 export class SignUpDto extends PickType(UserEntity, [
   'email',
