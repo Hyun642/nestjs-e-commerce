@@ -1,11 +1,19 @@
-import { Body, Controller, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { CreateShopDto } from './dto/entity/createshop.dto';
+import { CreateShopDto } from './dto/createshop.dto';
 import { GetUser } from 'src/user/get-user.decorator';
 import { User } from '@prisma/client';
 import { ShopService } from './shop.service';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
+import { GetShopListDto } from './dto/getShopList.dto';
 @Controller('shop')
 export class ShopController {
   constructor(private readonly shopService: ShopService) {}
@@ -25,5 +33,13 @@ export class ShopController {
       result: 'success',
       statusCode: HttpStatus.CREATED,
     };
+  }
+
+  @ApiBearerAuth('access-token')
+  @ApiResponse({ status: HttpStatus.OK, description: '상점 조회 성공' })
+  @Get('/getMyShopList')
+  @UseGuards(JwtAuthGuard)
+  async getMyShopList(@GetUser() user: User): Promise<GetShopListDto[] | null> {
+    return this.shopService.getMyShopList(user.id);
   }
 }
