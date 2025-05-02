@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { CreateShopDto } from './dto/createshop.dto';
-import { GetShopListDto } from './dto/getShopList.dto';
+import { GetShopInfoDto } from './dto/getShopInfo.dto';
 
 @Injectable()
 export class ShopRepository {
@@ -21,7 +20,7 @@ export class ShopRepository {
     });
   }
 
-  async getMyShopList(userId: string): Promise<GetShopListDto[] | null> {
+  async getMyShopList(userId: string): Promise<GetShopInfoDto[] | null> {
     const shops = await this.prisma.shop.findMany({
       where: {
         userId,
@@ -33,5 +32,21 @@ export class ShopRepository {
       description: shop.description,
       createdAt: shop.createdAt,
     }));
+  }
+
+  async getShopById(shopId: string): Promise<GetShopInfoDto | null> {
+    const shop = await this.prisma.shop.findFirst({
+      where: {
+        id: shopId,
+        deletedAt: null,
+      },
+    });
+    if (!shop) throw new NotFoundException('상점이 존재하지 않습니다.');
+
+    return {
+      name: shop.name,
+      description: shop.description,
+      createdAt: shop.createdAt,
+    };
   }
 }

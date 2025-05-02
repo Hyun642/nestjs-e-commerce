@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ShopRepository } from './shop.repository';
 import { CreateShopDto } from './dto/createshop.dto';
-import { GetShopListDto } from './dto/getShopList.dto';
+import { GetShopInfoDto } from './dto/getShopInfo.dto';
 
 @Injectable()
 export class ShopService {
@@ -10,7 +10,11 @@ export class ShopService {
     return await this.shopRepository.createShop(shopInfo, userId);
   }
 
-  async getMyShopList(userId: string): Promise<GetShopListDto[] | null> {
+  async getMyShopList(userId: string): Promise<GetShopInfoDto[] | null> {
     return await this.shopRepository.getMyShopList(userId);
+  }
+
+  async getShopById(shopId: string): Promise<GetShopInfoDto | null> {
+    return await this.shopRepository.getShopById(shopId);
   }
 }

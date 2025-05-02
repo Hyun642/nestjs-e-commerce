@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -13,7 +14,7 @@ import { GetUser } from 'src/user/get-user.decorator';
 import { User } from '@prisma/client';
 import { ShopService } from './shop.service';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
-import { GetShopListDto } from './dto/getShopList.dto';
+import { GetShopInfoDto } from './dto/getShopInfo.dto';
 @Controller('shop')
 export class ShopController {
   constructor(private readonly shopService: ShopService) {}
@@ -39,7 +40,18 @@ export class ShopController {
   @ApiResponse({ status: HttpStatus.OK, description: '상점 조회 성공' })
   @Get('/getMyShopList')
   @UseGuards(JwtAuthGuard)
-  async getMyShopList(@GetUser() user: User): Promise<GetShopListDto[] | null> {
+  async getMyShopList(@GetUser() user: User): Promise<GetShopInfoDto[] | null> {
     return this.shopService.getMyShopList(user.id);
+  }
+
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'ShopId로 상점 조회 성공',
+  })
+  @Get('/getShopById/:shopId')
+  async getShopById(
+    @Param('shopId') shopId: string,
+  ): Promise<GetShopInfoDto | null> {
+    return this.shopService.getShopById(shopId);
   }
 }
