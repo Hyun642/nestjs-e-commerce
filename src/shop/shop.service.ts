@@ -17,4 +17,12 @@ export class ShopService {
   async getShopById(shopId: string): Promise<GetShopInfoDto | null> {
     return await this.shopRepository.getShopById(shopId);
   }
+
+  async updateMyShopById(
+    shopId: string,
+    userId: string,
+    body: CreateShopDto,
+  ): Promise<void> {
+    await this.shopRepository.updateMyShopById(shopId, userId, body);
+  }
 }

@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -53,5 +54,22 @@ export class ShopController {
     @Param('shopId') shopId: string,
   ): Promise<GetShopInfoDto | null> {
     return this.shopService.getShopById(shopId);
+  }
+
+  @ApiBearerAuth('access-token')
+  @ApiResponse({ status: HttpStatus.OK, description: '상점 업데이트 성공' })
+  @Patch('/updateMyShopById/:shopId')
+  @UseGuards(JwtAuthGuard)
+  async updateMyShopById(
+    @Param('shopId') shopId: string,
+    @Body() body: CreateShopDto,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.shopService.updateMyShopById(shopId, user.id, body);
+    return {
+      message: '[상점 등록 정보] 업데이트 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+    };
   }
 }

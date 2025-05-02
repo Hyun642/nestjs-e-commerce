@@ -49,4 +49,27 @@ export class ShopRepository {
       createdAt: shop.createdAt,
     };
   }
+
+  async updateMyShopById(
+    shopId: string,
+    userId: string,
+    body: CreateShopDto,
+  ): Promise<void> {
+    const shop = await this.prisma.shop.findFirst({
+      where: {
+        id: shopId,
+        userId: userId,
+        deletedAt: null,
+      },
+    });
+    if (!shop) throw new NotFoundException('상점이 존재하지 않습니다.');
+
+    await this.prisma.shop.updateMany({
+      where: shop,
+      data: {
+        name: body.name,
+        description: body.description,
+      },
+    });
+  }
 }
