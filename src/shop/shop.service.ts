@@ -25,4 +25,8 @@ export class ShopService {
   ): Promise<void> {
     await this.shopRepository.updateMyShopById(shopId, userId, body);
   }
+
+  async deleteMyShopById(shopId: string, userId: string): Promise<void> {
+    await this.shopRepository.deleteMyShopById(shopId, userId);
+  }
 }

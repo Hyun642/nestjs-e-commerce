@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -68,6 +69,22 @@ export class ShopController {
     await this.shopService.updateMyShopById(shopId, user.id, body);
     return {
       message: '[상점 등록 정보] 업데이트 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  @ApiBearerAuth('access-token')
+  @ApiResponse({ status: HttpStatus.OK, description: '상점 삭제 성공' })
+  @Delete('/deleteMyShopById/:shopId')
+  @UseGuards(JwtAuthGuard)
+  async deleteMyShopById(
+    @Param('shopId') shopId: string,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.shopService.deleteMyShopById(shopId, user.id);
+    return {
+      message: '[상점 등록 정보] 삭제 성공',
       result: 'success',
       statusCode: HttpStatus.OK,
     };

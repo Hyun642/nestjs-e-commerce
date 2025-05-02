@@ -72,4 +72,22 @@ export class ShopRepository {
       },
     });
   }
+
+  async deleteMyShopById(shopId: string, userId: string): Promise<void> {
+    const shop = await this.prisma.shop.findFirst({
+      where: {
+        id: shopId,
+        userId: userId,
+        deletedAt: null,
+      },
+    });
+    if (!shop) throw new NotFoundException('상점이 존재하지 않습니다.');
+
+    await this.prisma.shop.updateMany({
+      where: shop,
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+  }
 }
