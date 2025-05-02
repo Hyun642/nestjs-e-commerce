@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { CreateShopDto } from './dto/createshop.dto';
 import { GetShopInfoDto } from './dto/getShopInfo.dto';
+import { SearchShopDto } from './dto/searchShop.dto';
 
 @Injectable()
 export class ShopRepository {
@@ -89,5 +90,38 @@ export class ShopRepository {
         deletedAt: new Date(),
       },
     });
+  }
+
+  async searchShop(query: SearchShopDto): Promise<any> {
+    const { keyword, page, limit, order } = query;
+    const skip = (page - 1) * limit;
+    const where = {
+      deletedAt: null,
+      ...(keyword && {
+        name: {
+          contains: keyword,
+        },
+      }),
+    };
+
+    const [data, total] = await this.prisma.shop
+      .findMany({
+        where,
+        orderBy: {
+          createdAt: order,
+        },
+        skip,
+        take: Number(limit),
+      })
+      .then(async (data) => {
+        const total = await this.prisma.shop.count({ where });
+        return [data, total];
+      });
+    return {
+      total,
+      page,
+      limit,
+      data,
+    };
   }
 }
