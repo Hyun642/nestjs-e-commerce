@@ -96,27 +96,25 @@ export class ShopRepository {
     const { keyword, page, limit, order } = query;
     const skip = (page - 1) * limit;
     const where = {
-      deletedAt: null,
       ...(keyword && {
         name: {
           contains: keyword,
         },
       }),
+      deletedAt: null,
     };
 
-    const [data, total] = await this.prisma.shop
-      .findMany({
-        where,
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.shop.findMany({
+        where: where,
         orderBy: {
           createdAt: order,
         },
         skip,
-        take: Number(limit),
-      })
-      .then(async (data) => {
-        const total = await this.prisma.shop.count({ where });
-        return [data, total];
-      });
+        take: limit,
+      }),
+      this.prisma.shop.count({ where: where }),
+    ]);
     return {
       total,
       page,
