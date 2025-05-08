@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class ProductOptionUnitEntity {
   @ApiProperty({
@@ -13,6 +13,7 @@ export class ProductOptionUnitEntity {
     description: '옵션 유닛명',
     example: '빨강',
   })
+  @IsNotEmpty()
   @IsString()
   name: string;
 
@@ -20,6 +21,7 @@ export class ProductOptionUnitEntity {
     description: '재고 수량',
     example: 100,
   })
+  @IsNotEmpty()
   @IsInt()
   stock: number;
 

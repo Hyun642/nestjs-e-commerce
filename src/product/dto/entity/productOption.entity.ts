@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsInt, IsBoolean } from 'class-validator';
+import { IsString, IsInt, IsBoolean, IsNotEmpty } from 'class-validator';
 
 export class ProductOptionEntity {
   @ApiProperty({
@@ -13,6 +13,7 @@ export class ProductOptionEntity {
     description: '상품 옵션명',
     example: '색상',
   })
+  @IsNotEmpty()
   @IsString()
   name: string;
 
@@ -20,6 +21,7 @@ export class ProductOptionEntity {
     description: '수량',
     example: 50,
   })
+  @IsNotEmpty()
   @IsInt()
   stock: number;
 
@@ -27,6 +29,7 @@ export class ProductOptionEntity {
     description: '필수 여부',
     example: true,
   })
+  @IsNotEmpty()
   @IsBoolean()
   isRequired: boolean;
 }
