@@ -161,4 +161,32 @@ export class ProductRepository {
       productOptionsWithUnits: productOptionsWithUnits,
     };
   }
+
+  async deleteProduct(productId: string, shopId: string, userId: string) {
+    const shop = await this.prisma.shop.findUnique({
+      where: { id: shopId },
+    });
+    if (!shop || shop.userId !== userId || shop.deletedAt !== null) {
+      throw new NotFoundException(
+        '해당 상점에 대한 권한이 없거나 존재하지 않습니다.',
+      );
+    }
+
+    const product = await this.prisma.product.findFirst({
+      where: {
+        id: productId,
+        deletedAt: null,
+      },
+    });
+    if (!product) throw new NotFoundException('상품이 존재하지 않습니다.');
+
+    await this.prisma.product.updateMany({
+      where: {
+        id: productId,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+  }
 }

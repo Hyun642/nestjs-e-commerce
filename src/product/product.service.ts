@@ -16,4 +16,12 @@ export class ProductService {
   async getProductDetail(productId: string) {
     return await this.productRepository.getProductDetail(productId);
   }
+
+  async deleteProduct(productId: string, shopId: string, userId: string) {
+    return await this.productRepository.deleteProduct(
+      productId,
+      shopId,
+      userId,
+    );
+  }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -49,5 +50,22 @@ export class ProductController {
   @Get('/getProductDetail/:productId')
   async getProductDetail(@Param('productId') productId: string) {
     return await this.productService.getProductDetail(productId);
+  }
+
+  @ApiBearerAuth('access-token')
+  @ApiResponse({ status: HttpStatus.OK, description: '상품 삭제 성공' })
+  @UseGuards(JwtAuthGuard)
+  @Delete('/deleteProduct/:shopId/:productId')
+  async deleteProduct(
+    @Param('productId') productId: string,
+    @Param('shopId') shopId: string,
+    @GetUser() user: User,
+  ) {
+    await this.productService.deleteProduct(productId, shopId, user.id);
+    return {
+      message: '[상품 등록 정보] 삭제 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+    };
   }
 }
