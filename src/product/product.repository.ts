@@ -69,4 +69,23 @@ export class ProductRepository {
       );
     }
   }
+
+  async getProductList(shopId: string) {
+    const productList = await this.prisma.product.findMany({
+      where: {
+        shopId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        shopId: true,
+        name: true,
+        price: true,
+        description: true,
+        thumbnailImageUrl: true,
+        createdAt: true,
+      },
+    });
+    return productList;
+  }
 }

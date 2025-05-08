@@ -8,4 +8,8 @@ export class ProductService {
   async createProduct(shopId: string, userId: string, product: ProductDto) {
     await this.productRepository.createProduct(shopId, userId, product);
   }
+
+  async getProductList(shopId: string) {
+    return await this.productRepository.getProductList(shopId);
+  }
 }

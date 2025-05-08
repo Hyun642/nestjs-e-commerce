@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Param,
   Post,
@@ -33,5 +34,10 @@ export class ProductController {
       result: 'success',
       statusCode: HttpStatus.CREATED,
     };
+  }
+
+  @Get('/getProductList/:shopId')
+  async getProductList(@Param('shopId') shopId: string) {
+    return await this.productService.getProductList(shopId);
   }
 }
