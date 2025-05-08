@@ -88,4 +88,77 @@ export class ProductRepository {
     });
     return productList;
   }
+
+  async getProductDetail(productId: string) {
+    const productInfo = await this.prisma.product.findFirst({
+      where: {
+        id: productId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        shopId: true,
+        name: true,
+        price: true,
+        description: true,
+        thumbnailImageUrl: true,
+        createdAt: true,
+      },
+    });
+
+    if (!productInfo) {
+      throw new NotFoundException('해당 상품이 존재하지 않습니다.');
+    }
+
+    const productImages = await this.prisma.productImage.findMany({
+      where: {
+        productId: productId,
+        deletedAt: null,
+      },
+      select: {
+        url: true,
+      },
+    });
+
+    const productOptions = await this.prisma.productOption.findMany({
+      where: {
+        productId: productId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        name: true,
+        stock: true,
+        isRequired: true,
+      },
+    });
+
+    const productOptionsWithUnits = await Promise.all(
+      productOptions.map(async (option) => {
+        const units = await this.prisma.productOptionUnit.findMany({
+          where: {
+            productOptionId: option.id,
+            deletedAt: null,
+          },
+          select: {
+            id: true,
+            name: true,
+            stock: true,
+            additionalPrice: true,
+          },
+        });
+
+        return {
+          ...option,
+          units,
+        };
+      }),
+    );
+
+    return {
+      productInfo,
+      productImages: productImages,
+      productOptionsWithUnits: productOptionsWithUnits,
+    };
+  }
 }

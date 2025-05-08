@@ -12,4 +12,8 @@ export class ProductService {
   async getProductList(shopId: string) {
     return await this.productRepository.getProductList(shopId);
   }
+
+  async getProductDetail(productId: string) {
+    return await this.productRepository.getProductDetail(productId);
+  }
 }

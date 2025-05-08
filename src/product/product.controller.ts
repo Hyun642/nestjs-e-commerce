@@ -36,8 +36,18 @@ export class ProductController {
     };
   }
 
+  @ApiResponse({ status: HttpStatus.OK, description: '상품 리스트 조회 성공' })
   @Get('/getProductList/:shopId')
   async getProductList(@Param('shopId') shopId: string) {
     return await this.productService.getProductList(shopId);
+  }
+
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상품 상세 조회 성공',
+  })
+  @Get('/getProductDetail/:productId')
+  async getProductDetail(@Param('productId') productId: string) {
+    return await this.productService.getProductDetail(productId);
   }
 }
