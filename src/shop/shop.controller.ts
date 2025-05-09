@@ -18,7 +18,7 @@ import { User } from '@prisma/client';
 import { ShopService } from './shop.service';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { GetShopInfoDto } from './dto/getShopInfo.dto';
-import { SearchShopDto } from './dto/searchShop.dto';
+import { SearchDto } from '../common/dto/search.dto';
 @Controller('shop')
 export class ShopController {
   constructor(private readonly shopService: ShopService) {}
@@ -94,7 +94,7 @@ export class ShopController {
 
   @ApiResponse({ status: HttpStatus.OK, description: '상점 검색 성공' })
   @Get('/search')
-  async searchShop(@Query() query: SearchShopDto): Promise<any> {
+  async searchShop(@Query() query: SearchDto): Promise<any> {
     return await this.shopService.searchShop(query);
   }
 }

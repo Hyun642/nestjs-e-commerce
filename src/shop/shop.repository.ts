@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { CreateShopDto } from './dto/createshop.dto';
 import { GetShopInfoDto } from './dto/getShopInfo.dto';
-import { SearchShopDto } from './dto/searchShop.dto';
+import { SearchDto } from 'src/common/dto/search.dto';
 
 @Injectable()
 export class ShopRepository {
@@ -92,7 +92,7 @@ export class ShopRepository {
     });
   }
 
-  async searchShop(query: SearchShopDto): Promise<any> {
+  async searchShop(query: SearchDto): Promise<any> {
     const { keyword, page, limit, order } = query;
     const skip = (page - 1) * limit;
     const where = {

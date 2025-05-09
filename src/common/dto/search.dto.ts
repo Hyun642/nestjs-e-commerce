@@ -1,13 +1,11 @@
-// src/shop/dto/search-shops.dto.ts
-
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsInt, Min, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class SearchShopDto {
+export class SearchDto {
   @ApiPropertyOptional({
-    description: '상점 검색 키워드(필수x)',
-    example: '마트',
+    description: '검색 키워드(필수x)',
+    example: '마트, 사과',
   })
   @IsOptional()
   @IsString()
