@@ -18,7 +18,10 @@ import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { ProductEntity } from './dto/entity/product.entity';
-import { ProductDetailResponse } from './dto/product-response.type';
+import {
+  ProductDetailResponse,
+  SearchProductDto,
+} from './dto/product-response.type';
 import { SearchDto } from 'src/common/dto/search.dto';
 
 @Controller('product')
@@ -105,7 +108,7 @@ export class ProductController {
 
   @ApiResponse({ status: HttpStatus.OK, description: '상품 검색 성공' })
   @Get('/search')
-  async searchProduct(@Query() query: SearchDto): Promise<any> {
+  async searchProduct(@Query() query: SearchDto): Promise<SearchProductDto> {
     return await this.productService.searchProduct(query);
   }
 
@@ -114,7 +117,7 @@ export class ProductController {
   async searchProductInShop(
     @Query() query: SearchDto,
     @Param('shopId') shopId: string,
-  ): Promise<any> {
+  ): Promise<SearchProductDto> {
     return await this.productService.searchProductInShop(query, shopId);
   }
 }

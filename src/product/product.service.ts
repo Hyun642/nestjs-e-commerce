@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ProductRepository } from './product.repository';
 import { ProductDto } from './dto/createProduct.dto';
 import { ProductEntity } from './dto/entity/product.entity';
-import { ProductDetailResponse } from './dto/product-response.type';
+import {
+  ProductDetailResponse,
+  SearchProductDto,
+} from './dto/product-response.type';
 
 @Injectable()
 export class ProductService {
@@ -49,11 +52,14 @@ export class ProductService {
     );
   }
 
-  async searchProduct(query: any): Promise<any> {
+  async searchProduct(query: any): Promise<SearchProductDto> {
     return await this.productRepository.searchProduct(query);
   }
 
-  async searchProductInShop(query: any, shopId: string): Promise<any> {
+  async searchProductInShop(
+    query: any,
+    shopId: string,
+  ): Promise<SearchProductDto> {
     return await this.productRepository.searchProductInShop(query, shopId);
   }
 }

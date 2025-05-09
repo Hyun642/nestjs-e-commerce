@@ -22,3 +22,19 @@ export type ProductDetailResponse = {
     }[];
   }[];
 };
+
+class ProductDto {
+  id: string;
+  shopId: string;
+  thumbnailImageUrl: string;
+  name: string;
+  description: string;
+  price: number;
+}
+
+export class SearchProductDto {
+  total: number;
+  page: number;
+  limit: number;
+  data: ProductDto[];
+}

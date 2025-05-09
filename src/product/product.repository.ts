@@ -2,7 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { ProductDto } from './dto/createProduct.dto';
 import { ProductEntity } from './dto/entity/product.entity';
-import { ProductDetailResponse } from './dto/product-response.type';
+import {
+  ProductDetailResponse,
+  SearchProductDto,
+} from './dto/product-response.type';
 
 @Injectable()
 export class ProductRepository {
@@ -291,7 +294,7 @@ export class ProductRepository {
     }
   }
 
-  async searchProduct(query: any): Promise<any> {
+  async searchProduct(query: any): Promise<SearchProductDto> {
     const { keyword, page, limit, order } = query;
     const skip = (page - 1) * limit;
     const where = {
@@ -330,7 +333,10 @@ export class ProductRepository {
     };
   }
 
-  async searchProductInShop(query: any, shopId: string): Promise<any> {
+  async searchProductInShop(
+    query: any,
+    shopId: string,
+  ): Promise<SearchProductDto> {
     const { keyword, page, limit, order } = query;
     const skip = (page - 1) * limit;
     const where = {
