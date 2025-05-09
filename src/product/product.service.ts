@@ -34,4 +34,18 @@ export class ProductService {
       userId,
     );
   }
+
+  async updateProduct(
+    productId: string,
+    shopId: string,
+    userId: string,
+    product: ProductDto,
+  ): Promise<void> {
+    return await this.productRepository.updateProduct(
+      productId,
+      shopId,
+      userId,
+      product,
+    );
+  }
 }

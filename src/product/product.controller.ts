@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -71,6 +72,30 @@ export class ProductController {
     await this.productService.deleteProduct(productId, shopId, user.id);
     return {
       message: '[상품 등록 정보] 삭제 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  @ApiBearerAuth('access-token')
+  @ApiResponse({ status: HttpStatus.OK, description: '상품 수정 성공' })
+  @ApiBody({ type: ProductDto })
+  @UseGuards(JwtAuthGuard)
+  @Patch('/updateProduct/:shopId/:productId')
+  async updateProduct(
+    @Param('productId') productId: string,
+    @Param('shopId') shopId: string,
+    @Body() product: ProductDto,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.productService.updateProduct(
+      productId,
+      shopId,
+      user.id,
+      product,
+    );
+    return {
+      message: '[상품 등록 정보] 수정 성공',
       result: 'success',
       statusCode: HttpStatus.OK,
     };
