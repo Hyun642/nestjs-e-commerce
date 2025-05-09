@@ -14,6 +14,9 @@ import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { GetUser } from 'src/user/get-user.decorator';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { DefaultResponseDto } from 'src/common/dto/response.dto';
+import { ProductEntity } from './dto/entity/product.entity';
+import { ProductDetailResponse } from './dto/product-response.type';
 
 @Controller('product')
 export class ProductController {
@@ -28,7 +31,7 @@ export class ProductController {
     @Param('shopId') shopId: string,
     @Body() product: ProductDto,
     @GetUser() user: User,
-  ) {
+  ): Promise<DefaultResponseDto> {
     await this.productService.createProduct(shopId, user.id, product);
     return {
       message: '[상품 등록 정보] 등록 성공',
@@ -39,7 +42,9 @@ export class ProductController {
 
   @ApiResponse({ status: HttpStatus.OK, description: '상품 리스트 조회 성공' })
   @Get('/getProductList/:shopId')
-  async getProductList(@Param('shopId') shopId: string) {
+  async getProductList(
+    @Param('shopId') shopId: string,
+  ): Promise<ProductEntity[]> {
     return await this.productService.getProductList(shopId);
   }
 
@@ -48,7 +53,9 @@ export class ProductController {
     description: '상품 상세 조회 성공',
   })
   @Get('/getProductDetail/:productId')
-  async getProductDetail(@Param('productId') productId: string) {
+  async getProductDetail(
+    @Param('productId') productId: string,
+  ): Promise<ProductDetailResponse> {
     return await this.productService.getProductDetail(productId);
   }
 
@@ -60,7 +67,7 @@ export class ProductController {
     @Param('productId') productId: string,
     @Param('shopId') shopId: string,
     @GetUser() user: User,
-  ) {
+  ): Promise<DefaultResponseDto> {
     await this.productService.deleteProduct(productId, shopId, user.id);
     return {
       message: '[상품 등록 정보] 삭제 성공',

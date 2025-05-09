@@ -10,7 +10,7 @@ export class ShopEntity {
   @IsString()
   userId: string;
 
-  @ApiProperty({ description: '사용자 이름', example: '홍길동' })
+  @ApiProperty({ description: '사용자 이름', example: '홍길동 과일 가게' })
   @IsString()
   name: string;
 

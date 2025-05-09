@@ -1,10 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class ProductEntity {
   @ApiProperty({ description: '상품 고유 번호', example: 'qwe123' })
   @IsString()
   id: string;
+
+  @ApiProperty({ description: 'shopId', example: 'qwe' })
+  @IsString()
+  shopId: string;
 
   @ApiProperty({ description: '상품 이름', example: '사과' })
   @IsNotEmpty()
@@ -31,5 +35,9 @@ export class ProductEntity {
   })
   @IsNotEmpty()
   @IsString()
-  thumnailImageUrl: string;
+  thumbnailImageUrl: string;
+
+  @ApiProperty({ description: '생성일시', example: '2025-02-12T02:00:00.000Z' })
+  @IsDateString()
+  createdAt: Date;
 }

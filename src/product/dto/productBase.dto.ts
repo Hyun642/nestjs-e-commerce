@@ -5,5 +5,5 @@ export class ProductBaseDto extends PickType(ProductEntity, [
   'name',
   'description',
   'price',
-  'thumnailImageUrl',
+  'thumbnailImageUrl',
 ]) {}

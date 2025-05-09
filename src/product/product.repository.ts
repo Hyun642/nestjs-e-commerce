@@ -1,12 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { ProductDto } from './dto/createProduct.dto';
+import { ProductEntity } from './dto/entity/product.entity';
+import { ProductDetailResponse } from './dto/product-response.type';
 
 @Injectable()
 export class ProductRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createProduct(shopId: string, userId: string, product: ProductDto) {
+  async createProduct(
+    shopId: string,
+    userId: string,
+    product: ProductDto,
+  ): Promise<void> {
     const shop = await this.prisma.shop.findUnique({
       where: { id: shopId },
     });
@@ -20,7 +26,7 @@ export class ProductRepository {
       data: {
         name: product.name,
         price: product.price,
-        thumbnailImageUrl: product.thumnailImageUrl,
+        thumbnailImageUrl: product.thumbnailImageUrl,
         description: product.description,
         shop: {
           connect: { id: shopId },
@@ -70,7 +76,7 @@ export class ProductRepository {
     }
   }
 
-  async getProductList(shopId: string) {
+  async getProductList(shopId: string): Promise<ProductEntity[]> {
     const productList = await this.prisma.product.findMany({
       where: {
         shopId,
@@ -89,7 +95,7 @@ export class ProductRepository {
     return productList;
   }
 
-  async getProductDetail(productId: string) {
+  async getProductDetail(productId: string): Promise<ProductDetailResponse> {
     const productInfo = await this.prisma.product.findFirst({
       where: {
         id: productId,
@@ -162,7 +168,11 @@ export class ProductRepository {
     };
   }
 
-  async deleteProduct(productId: string, shopId: string, userId: string) {
+  async deleteProduct(
+    productId: string,
+    shopId: string,
+    userId: string,
+  ): Promise<void> {
     const shop = await this.prisma.shop.findUnique({
       where: { id: shopId },
     });
