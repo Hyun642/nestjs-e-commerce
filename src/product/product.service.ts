@@ -48,4 +48,8 @@ export class ProductService {
       product,
     );
   }
+
+  async searchProduct(query: any): Promise<any> {
+    return await this.productRepository.searchProduct(query);
+  }
 }

@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
@@ -18,6 +19,7 @@ import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { ProductEntity } from './dto/entity/product.entity';
 import { ProductDetailResponse } from './dto/product-response.type';
+import { SearchDto } from 'src/common/dto/search.dto';
 
 @Controller('product')
 export class ProductController {
@@ -99,5 +101,11 @@ export class ProductController {
       result: 'success',
       statusCode: HttpStatus.OK,
     };
+  }
+
+  @ApiResponse({ status: HttpStatus.OK, description: '상품 검색 성공' })
+  @Get('/search')
+  async searchProduct(@Query() query: SearchDto): Promise<any> {
+    return await this.productService.searchProduct(query);
   }
 }
