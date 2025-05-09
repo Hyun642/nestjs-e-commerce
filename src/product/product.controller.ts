@@ -108,4 +108,13 @@ export class ProductController {
   async searchProduct(@Query() query: SearchDto): Promise<any> {
     return await this.productService.searchProduct(query);
   }
+
+  @ApiResponse({ status: HttpStatus.OK, description: '상품 검색 성공' })
+  @Get('/search/:shopId')
+  async searchProductInShop(
+    @Query() query: SearchDto,
+    @Param('shopId') shopId: string,
+  ): Promise<any> {
+    return await this.productService.searchProductInShop(query, shopId);
+  }
 }

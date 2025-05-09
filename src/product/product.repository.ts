@@ -329,4 +329,44 @@ export class ProductRepository {
       data,
     };
   }
+
+  async searchProductInShop(query: any, shopId: string): Promise<any> {
+    const { keyword, page, limit, order } = query;
+    const skip = (page - 1) * limit;
+    const where = {
+      ...(keyword && {
+        name: {
+          contains: keyword,
+        },
+      }),
+      shopId,
+      deletedAt: null,
+    };
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where: where,
+        orderBy: {
+          createdAt: order,
+        },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          shopId: true,
+          thumbnailImageUrl: true,
+          name: true,
+          description: true,
+          price: true,
+        },
+      }),
+      this.prisma.product.count({ where: where }),
+    ]);
+    return {
+      total,
+      page,
+      limit,
+      data,
+    };
+  }
 }

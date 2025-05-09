@@ -52,4 +52,8 @@ export class ProductService {
   async searchProduct(query: any): Promise<any> {
     return await this.productRepository.searchProduct(query);
   }
+
+  async searchProductInShop(query: any, shopId: string): Promise<any> {
+    return await this.productRepository.searchProductInShop(query, shopId);
+  }
 }
