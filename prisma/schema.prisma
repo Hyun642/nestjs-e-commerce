@@ -106,6 +106,7 @@ model ProductOptionUnit{
   stock Int
   additionalPrice Int
   deletedAt DateTime? @db.Timestamp(3)
+  cartItem CartItem[]
 }
 
 model ProductReview {
@@ -136,6 +137,8 @@ model CartItem{
   userId String
   product Product @relation(fields: [productId], references: [id])
   productId  String
+  productionOptionUnit ProductOptionUnit @relation(fields: [productOptionUnitId], references: [id])
+  productOptionUnitId Int
   quantity String
   createdAt DateTime @db.Timestamp(3) @default(now())
   deletedAt DateTime? @db.Timestamp(3)
