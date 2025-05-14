@@ -139,7 +139,7 @@ model CartItem{
   productId  String
   productionOptionUnit ProductOptionUnit @relation(fields: [productOptionUnitId], references: [id])
   productOptionUnitId Int
-  quantity String
+  quantity Int
   createdAt DateTime @db.Timestamp(3) @default(now())
   deletedAt DateTime? @db.Timestamp(3)
 }
