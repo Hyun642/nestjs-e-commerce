@@ -5,7 +5,6 @@ import { JwtStrategy } from 'src/auth/jwt.strategy';
 import { ProductRepository } from './product.repository';
 
 @Module({
-  imports: [ProductModule],
   controllers: [ProductController],
   providers: [ProductService, JwtStrategy, ProductRepository],
 })
