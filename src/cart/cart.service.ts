@@ -6,7 +6,7 @@ import { AddCartItem } from './dto/addCartIem.dto';
 export class CartService {
   constructor(private readonly cartRepository: CartRepository) {}
 
-  async addCartItem(itemInfo: AddCartItem, userId: string): Promise<any> {
+  async addCartItem(itemInfo: AddCartItem, userId: string): Promise<void> {
     await this.cartRepository.addCartItem(itemInfo, userId);
   }
 }

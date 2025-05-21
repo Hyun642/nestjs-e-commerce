@@ -5,7 +5,7 @@ import { AddCartItem } from './dto/addCartIem.dto';
 @Injectable()
 export class CartRepository {
   constructor(private readonly prisma: PrismaService) {}
-  async addCartItem(itemInfo: AddCartItem, userId: string): Promise<any> {
+  async addCartItem(itemInfo: AddCartItem, userId: string): Promise<void> {
     const { productId, quantity, productOptionUnitId } = itemInfo;
 
     const newCartItem = await this.prisma.cartItem.create({
