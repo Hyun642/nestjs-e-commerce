@@ -1,4 +1,11 @@
-import { Body, Controller, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CartService } from './cart.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetUser } from 'src/user/get-user.decorator';
@@ -6,6 +13,7 @@ import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { AddCartItem } from './dto/addCartIem.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
+import { CartItemWithOptionUnits } from './dto/cartItem.type';
 
 @Controller('cart')
 export class CartController {
@@ -24,5 +32,14 @@ export class CartController {
       result: 'success',
       statusCode: HttpStatus.CREATED,
     };
+  }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Get('/getMyCartItems')
+  async getMyCartItems(
+    @GetUser() user: User,
+  ): Promise<CartItemWithOptionUnits[]> {
+    return await this.cartService.getMyCartItems(user.id);
   }
 }

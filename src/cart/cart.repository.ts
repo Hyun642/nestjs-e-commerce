@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { AddCartItem } from './dto/addCartIem.dto';
+import { CartItemWithOptionUnits } from './dto/cartItem.type';
 
 @Injectable()
 export class CartRepository {
@@ -25,5 +26,29 @@ export class CartRepository {
         }),
       ),
     );
+  }
+
+  async getMyCartItems(userId: string): Promise<CartItemWithOptionUnits[]> {
+    return await this.prisma.cartItem.findMany({
+      where: { userId: userId, deletedAt: null },
+      include: {
+        product: {
+          select: {
+            price: true,
+          },
+        },
+        cartItemOptionUnit: {
+          select: {
+            productionOptionUnit: {
+              select: {
+                id: true,
+                name: true,
+                additionalPrice: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 }
