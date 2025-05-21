@@ -14,4 +14,8 @@ export class CartService {
   async getMyCartItems(userId: string): Promise<CartItemWithOptionUnits[]> {
     return await this.cartRepository.getMyCartItems(userId);
   }
+
+  async deleteCartItem(cartItemId: number, userId: string): Promise<void> {
+    return await this.cartRepository.deleteCartItem(cartItemId, userId);
+  }
 }

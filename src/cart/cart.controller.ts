@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -41,5 +43,21 @@ export class CartController {
     @GetUser() user: User,
   ): Promise<CartItemWithOptionUnits[]> {
     return await this.cartService.getMyCartItems(user.id);
+  }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Delete('/deleteCartItem/:cartItemId')
+  async deleteCartItem(
+    @Param('cartItemId') cartItemId: number,
+    @GetUser()
+    user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.cartService.deleteCartItem(cartItemId, user.id);
+    return {
+      message: '[장바구니 아이템 정보] 삭제 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+    };
   }
 }

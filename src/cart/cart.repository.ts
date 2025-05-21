@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { AddCartItem } from './dto/addCartIem.dto';
 import { CartItemWithOptionUnits } from './dto/cartItem.type';
@@ -48,6 +48,25 @@ export class CartRepository {
             },
           },
         },
+      },
+    });
+  }
+
+  async deleteCartItem(cartItemId: number, userId: string): Promise<void> {
+    const item = await this.prisma.cartItem.findUnique({
+      where: { id: cartItemId, userId: userId, deletedAt: null },
+    });
+
+    if (!item || item.userId !== userId || item.deletedAt !== null) {
+      throw new NotFoundException(
+        '해당 아이템에 대한 권한이 없거나 이미 삭제 되었습니다.',
+      );
+    }
+
+    await this.prisma.cartItem.updateMany({
+      where: { id: cartItemId, userId: userId, deletedAt: null },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }
