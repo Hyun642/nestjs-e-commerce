@@ -18,4 +18,12 @@ export class CartService {
   async deleteCartItem(cartItemId: number, userId: string): Promise<void> {
     return await this.cartRepository.deleteCartItem(cartItemId, userId);
   }
+
+  async updateCartItem(
+    cartItemId: number,
+    itemInfo: AddCartItem,
+    userId: string,
+  ): Promise<void> {
+    await this.cartRepository.updateCartItem(cartItemId, itemInfo, userId);
+  }
 }

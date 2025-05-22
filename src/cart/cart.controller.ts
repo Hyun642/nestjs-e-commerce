@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -56,6 +57,22 @@ export class CartController {
     await this.cartService.deleteCartItem(cartItemId, user.id);
     return {
       message: '[장바구니 아이템 정보] 삭제 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Patch('/updateCartItem/:cartItemId')
+  async updateCartItem(
+    @Param('cartItemId') cartItemId: number,
+    @Body() itemInfo: AddCartItem,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.cartService.updateCartItem(cartItemId, itemInfo, user.id);
+    return {
+      message: '[장바구니 아이템 정보] 수정 성공',
       result: 'success',
       statusCode: HttpStatus.OK,
     };
