@@ -6,9 +6,17 @@ import { PrismaModule } from './databases/prisma/prisma.module';
 import { ShopModule } from './shop/shop.module';
 import { ProductModule } from './product/product.module';
 import { CartModule } from './cart/cart.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, ShopModule, ProductModule, CartModule],
+  imports: [
+    PrismaModule,
+    UserModule,
+    ShopModule,
+    ProductModule,
+    CartModule,
+    OrderModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
