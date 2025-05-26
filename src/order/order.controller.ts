@@ -1,4 +1,11 @@
-import { Body, Controller, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -24,6 +31,21 @@ export class OrderController {
       message: '[주문] 주문 성공',
       result: 'success',
       statusCode: HttpStatus.CREATED,
+    };
+  }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Post('/refund/:id')
+  async refund(
+    @Param('id') orderId: string,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.orderService.refund(orderId, user.id);
+    return {
+      message: '[주문] 환불 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
     };
   }
 }

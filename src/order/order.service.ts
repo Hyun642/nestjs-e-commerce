@@ -10,4 +10,9 @@ export class OrderService {
     await this.orderRepository.order(orderInfo, userId);
     return;
   }
+
+  async refund(orderId: string, userId: string) {
+    await this.orderRepository.refund(orderId, userId);
+    return;
+  }
 }
