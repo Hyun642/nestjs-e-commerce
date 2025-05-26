@@ -43,7 +43,22 @@ export class OrderController {
   ): Promise<DefaultResponseDto> {
     await this.orderService.refund(orderId, user.id);
     return {
-      message: '[주문] 환불 성공',
+      message: '[주문] 환불 요청 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Post('/return/:id')
+  async return(
+    @Param('id') orderId: string,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.orderService.return(orderId, user.id);
+    return {
+      message: '[주문] 반품 요청 성공',
       result: 'success',
       statusCode: HttpStatus.OK,
     };

@@ -15,4 +15,9 @@ export class OrderService {
     await this.orderRepository.refund(orderId, userId);
     return;
   }
+
+  async return(orderId: string, userId: string) {
+    await this.orderRepository.return(orderId, userId);
+    return;
+  }
 }

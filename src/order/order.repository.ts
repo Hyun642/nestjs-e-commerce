@@ -63,4 +63,30 @@ export class OrderRepository {
     if (updatedOrder.count === 0)
       throw new NotFoundException('해당 주문을 찾을 수 없습니다.');
   }
+
+  async return(orderId: string, userId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order || order.userId !== userId) {
+      throw new ForbiddenException(
+        '해당 주문에 대한 권한이 없거나 존재하지 않습니다.',
+      );
+    }
+
+    if (order.orderStatus != '도착') {
+      throw new BadRequestException('해당 상태에서는 반품이 불가합니다.');
+    }
+
+    const updatedOrder = await this.prisma.order.updateMany({
+      where: { id: orderId, userId },
+      data: {
+        orderStatus: '반품진행',
+      },
+    });
+
+    if (updatedOrder.count === 0)
+      throw new NotFoundException('해당 주문을 찾을 수 없습니다.');
+  }
 }
