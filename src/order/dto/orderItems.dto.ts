@@ -2,7 +2,10 @@ import { ApiProperty, PickType } from '@nestjs/swagger';
 import { OrderEntity } from './\bentity/order.entity';
 import { OrderItemEntity } from './\bentity/orderItem.entity';
 
-class BaseOrderDto extends PickType(OrderEntity, ['orderStatus']) {}
+class BaseOrderDto extends PickType(OrderEntity, [
+  'orderStatus',
+  'userAddressId',
+]) {}
 class OrderItemsDto extends PickType(OrderItemEntity, [
   'productId',
   'productOptionUnitId',

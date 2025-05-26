@@ -7,10 +7,11 @@ export class OrderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async order(orderInfo: OrderDto, userId: string) {
-    const { orderStatus } = orderInfo;
+    const { orderStatus, userAddressId } = orderInfo;
     const newOrder = await this.prisma.order.create({
       data: {
         userId,
+        userAddressId,
         orderStatus,
       },
     });

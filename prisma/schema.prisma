@@ -47,6 +47,7 @@ model UserAddress {
   name String
   address String
   deletedAt DateTime? @db.Timestamp(3)
+  order Order[]
 }
 
 model BusinessLicense {
@@ -169,6 +170,8 @@ model Order{
   id String @id @default(uuid())
   user User @relation(fields: [userId], references: [id])
   userId String
+  userAddress UserAddress @relation(fields: [userAddressId], references: [id])
+  userAddressId Int
   orderStatus OrderStatus
   createdAt DateTime @db.Timestamp(3) @default(now())
   canceledAt DateTime? @db.Timestamp(3)

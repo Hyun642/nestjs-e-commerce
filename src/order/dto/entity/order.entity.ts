@@ -11,6 +11,10 @@ export class OrderEntity {
   @IsString()
   userId: string;
 
+  @ApiProperty({ description: 'UserAddress ID', example: '1' })
+  @IsInt()
+  userAddressId: number;
+
   @ApiProperty({
     description: '진행 상태',
     example: '결제완료',
