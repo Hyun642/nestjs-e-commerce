@@ -14,6 +14,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum OrderStatus{
+  결제완료
+  배송중
+  도착
+  환불진행
+  환불완료
+  반품진행
+  반품완료 
+}
 model User {
   id String @id @default(uuid())
   email String @unique @db.VarChar(50)
@@ -28,6 +37,7 @@ model User {
   shop Shop[]
   productReview ProductReview[]
   cartItem CartItem[]
+  order Order[]
 }
 
 model UserAddress {
@@ -75,6 +85,7 @@ model Product{
   productImage ProductImage[]
   productReview ProductReview[]
   cartItem CartItem[]
+  orderItem OrderItem[]
 }
 
 model ProductImage{
@@ -107,6 +118,7 @@ model ProductOptionUnit{
   additionalPrice Int
   deletedAt DateTime? @db.Timestamp(3)
   cartItemOptionUnit CartItemOptionUnit[]
+  orderItem OrderItem[]
 }
 
 model ProductReview {
@@ -150,4 +162,27 @@ model CartItemOptionUnit{
   productOptionUnitId Int
 
   @@id([cartItemId,productOptionUnitId])
+
+}
+
+model Order{
+  id String @id @default(uuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  orderStatus OrderStatus
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  canceledAt DateTime? @db.Timestamp(3)
+  deletedAt DateTime? @db.Timestamp(3)
+  orderItem OrderItem[]
+  }
+
+model OrderItem{
+  id Int @id @default(autoincrement())
+  order Order @relation(fields: [orderId], references: [id])
+  orderId String
+  product Product @relation(fields: [productId], references: [id])
+  productId String
+  productOptionUnit ProductOptionUnit @relation(fields: [productOptionUnitId], references: [id])
+  productOptionUnitId Int
+  quantity Int
 }
