@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Param,
+  Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
@@ -13,6 +16,7 @@ import { GetUser } from 'src/user/get-user.decorator';
 import { User } from '@prisma/client';
 import { OrderDto } from './dto/orderitems.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
+import { PaginationDto } from 'src/common/dto/paginationDto';
 
 @Controller('order')
 export class OrderController {
@@ -36,7 +40,7 @@ export class OrderController {
 
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
-  @Post('/refund/:id')
+  @Patch('/refund/:id')
   async refund(
     @Param('id') orderId: string,
     @GetUser() user: User,
@@ -51,7 +55,7 @@ export class OrderController {
 
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
-  @Post('/return/:id')
+  @Patch('/return/:id')
   async return(
     @Param('id') orderId: string,
     @GetUser() user: User,
@@ -62,5 +66,15 @@ export class OrderController {
       result: 'success',
       statusCode: HttpStatus.OK,
     };
+  }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Get('/list')
+  async getOrdersByUserId(
+    @Query() query: PaginationDto,
+    @GetUser() user: User,
+  ) {
+    return await this.orderService.getOrdersByUserId(query, user.id);
   }
 }

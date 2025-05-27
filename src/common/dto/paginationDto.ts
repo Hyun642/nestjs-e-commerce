@@ -2,14 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsInt, Min, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class SearchDto {
-  @ApiPropertyOptional({
-    description: '검색 키워드(필수x)',
-  })
-  @IsOptional()
-  @IsString()
-  keyword?: string;
-
+export class PaginationDto {
   @ApiPropertyOptional({ description: '페이지 번호', example: 1 })
   @IsOptional()
   @Type(() => Number)

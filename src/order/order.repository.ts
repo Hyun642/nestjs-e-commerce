@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { OrderDto } from './dto/orderitems.dto';
+import { SearchDto } from 'src/common/dto/search.dto';
 
 @Injectable()
 export class OrderRepository {
@@ -88,5 +89,54 @@ export class OrderRepository {
 
     if (updatedOrder.count === 0)
       throw new NotFoundException('해당 주문을 찾을 수 없습니다.');
+  }
+
+  async getOrdersByUserId(query: SearchDto, userId: string) {
+    const { page, limit, order } = query;
+    const skip = (page - 1) * limit;
+    const where = {
+      userId: userId,
+      deletedAt: null,
+    };
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where: where,
+        orderBy: {
+          createdAt: order,
+        },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          orderStatus: true,
+          createdAt: true,
+          userAddress: {
+            select: {
+              id: true,
+              name: true,
+              address: true,
+            },
+          },
+          orderItem: {
+            select: {
+              product: {
+                select: { name: true, price: true },
+              },
+              productOptionUnit: {
+                select: { name: true, additionalPrice: true },
+              },
+            },
+          },
+        },
+      }),
+      this.prisma.order.count({ where: where }),
+    ]);
+    return {
+      total,
+      page,
+      limit,
+      data,
+    };
   }
 }
