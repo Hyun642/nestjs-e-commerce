@@ -7,12 +7,13 @@ import {
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { OrderDto } from './dto/orderitems.dto';
 import { SearchDto } from 'src/common/dto/search.dto';
+import { OrderListResponseDto } from './dto/orderListResponse.dto';
 
 @Injectable()
 export class OrderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async order(orderInfo: OrderDto, userId: string) {
+  async order(orderInfo: OrderDto, userId: string): Promise<void> {
     const { orderStatus, userAddressId } = orderInfo;
     const newOrder = await this.prisma.order.create({
       data: {
@@ -35,7 +36,7 @@ export class OrderRepository {
     );
   }
 
-  async refund(orderId: string, userId: string) {
+  async refund(orderId: string, userId: string): Promise<void> {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
     });
@@ -65,7 +66,7 @@ export class OrderRepository {
       throw new NotFoundException('해당 주문을 찾을 수 없습니다.');
   }
 
-  async return(orderId: string, userId: string) {
+  async return(orderId: string, userId: string): Promise<void> {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
     });
@@ -91,7 +92,10 @@ export class OrderRepository {
       throw new NotFoundException('해당 주문을 찾을 수 없습니다.');
   }
 
-  async getOrdersByUserId(query: SearchDto, userId: string) {
+  async getOrdersByUserId(
+    query: SearchDto,
+    userId: string,
+  ): Promise<OrderListResponseDto> {
     const { page, limit, order } = query;
     const skip = (page - 1) * limit;
     const where = {

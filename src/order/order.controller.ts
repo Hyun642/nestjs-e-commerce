@@ -11,12 +11,13 @@ import {
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { GetUser } from 'src/user/get-user.decorator';
 import { User } from '@prisma/client';
 import { OrderDto } from './dto/orderitems.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { PaginationDto } from 'src/common/dto/paginationDto';
+import { OrderListResponseDto } from './dto/orderListResponse.dto';
 
 @Controller('order')
 export class OrderController {
@@ -68,13 +69,14 @@ export class OrderController {
     };
   }
 
+  @ApiResponse({ status: 200, type: OrderListResponseDto })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Get('/list')
   async getOrdersByUserId(
     @Query() query: PaginationDto,
     @GetUser() user: User,
-  ) {
+  ): Promise<OrderListResponseDto> {
     return await this.orderService.getOrdersByUserId(query, user.id);
   }
 }
