@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ReviewRepository } from './review.repository';
-import { CreateReviewDto } from './dto/createProduct.dto';
+import { CreateReviewDto } from './dto/createReview.dto';
 import { MyReviewItemList } from './dto/review-Response.dto';
+import { UpdateReviewDto } from './dto/updateReview.dto';
 
 @Injectable()
 export class ReviewService {
@@ -20,5 +21,17 @@ export class ReviewService {
 
   async deleteProductReview(reviewId: number, userId: string): Promise<void> {
     await this.reviewRepository.deleteProductReview(reviewId, userId);
+  }
+
+  async updateProductReview(
+    reviewInfo: UpdateReviewDto,
+    reviewId: number,
+    userId: string,
+  ): Promise<void> {
+    await this.reviewRepository.updateProductReview(
+      reviewInfo,
+      reviewId,
+      userId,
+    );
   }
 }
