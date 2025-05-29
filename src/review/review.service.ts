@@ -17,4 +17,8 @@ export class ReviewService {
   async getMyReviewList(userId: string): Promise<MyReviewItemList[]> {
     return await this.reviewRepository.getMyReviewList(userId);
   }
+
+  async deleteProductReview(reviewId: number, userId: string): Promise<void> {
+    await this.reviewRepository.deleteProductReview(reviewId, userId);
+  }
 }

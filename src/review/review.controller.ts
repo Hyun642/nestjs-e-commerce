@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -39,5 +41,20 @@ export class ReviewController {
   @Get('/getMyReviewList')
   async getMyReviewList(@GetUser() user: User): Promise<MyReviewItemList[]> {
     return await this.reviewService.getMyReviewList(user.id);
+  }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Delete('/deleteProductReview/:reviewId')
+  async deleteProductReview(
+    @Param('reviewId') reviewId: number,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.reviewService.deleteProductReview(reviewId, user.id);
+    return {
+      message: '[상품 리뷰 정보] 삭제 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+    };
   }
 }
