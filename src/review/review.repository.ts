@@ -36,7 +36,7 @@ export class ReviewRepository {
 
   async getMyReviewList(userId: string): Promise<MyReviewItemList[]> {
     return await this.prisma.productReview.findMany({
-      where: { userId },
+      where: { userId, deletedAt: null },
       select: {
         id: true,
         product: {
