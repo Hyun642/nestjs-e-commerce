@@ -1,4 +1,11 @@
-import { Body, Controller, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { GetUser } from 'src/user/get-user.decorator';
 import { User } from '@prisma/client';
@@ -6,6 +13,7 @@ import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { CreateReviewDto } from './dto/createProduct.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { MyReviewItemList } from './dto/review-Response.dto';
 
 @Controller('review')
 export class ReviewController {
@@ -24,5 +32,12 @@ export class ReviewController {
       result: 'success',
       statusCode: HttpStatus.CREATED,
     };
+  }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Get('/getMyReviewList')
+  async getMyReviewList(@GetUser() user: User): Promise<MyReviewItemList[]> {
+    return await this.reviewService.getMyReviewList(user.id);
   }
 }

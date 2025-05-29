@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { CreateReviewDto } from './dto/createProduct.dto';
+import { MyReviewItemList } from './dto/review-Response.dto';
 
 @Injectable()
 export class ReviewRepository {
@@ -31,5 +32,34 @@ export class ReviewRepository {
         }),
       ),
     );
+  }
+
+  async getMyReviewList(userId: string): Promise<MyReviewItemList[]> {
+    return await this.prisma.productReview.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        product: {
+          select: {
+            name: true,
+            price: true,
+          },
+        },
+        orderItem: {
+          select: {
+            productOptionUnit: {
+              select: {
+                name: true,
+                additionalPrice: true,
+              },
+            },
+            quantity: true,
+          },
+        },
+        score: true,
+        content: true,
+        updatedAt: true,
+      },
+    });
   }
 }
