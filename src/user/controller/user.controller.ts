@@ -3,7 +3,6 @@ import {
   Post,
   Body,
   UseGuards,
-  HttpCode,
   HttpStatus,
   Get,
   Delete,
@@ -28,30 +27,27 @@ import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiResponse({ status: 201, description: '회원가입 성공' })
-  @ApiResponse({ status: 409, description: '중복 에러' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: '회원가입 성공' })
+  @ApiResponse({ status: HttpStatus.CONFLICT, description: '중복 에러' })
   @Post('/signup')
   async signUp(@Body() user: SignUpDto): Promise<SignUpDto> {
     return await this.userService.signUp(user);
   }
 
-  @ApiResponse({ status: 201, description: '로그인 성공' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: '로그인 성공' })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '정보가 일치하지 않거나 존재 하지 않음',
+  })
   @Post('/login')
   async logIn(@Body() input: LogInDto): Promise<{ accessToken: string }> {
     return await this.userService.logIn(input);
   }
 
-  @Post('/sendtokentest')
-  @UseGuards(JwtAuthGuard)
-  sendtokentest(@GetUser() user: User) {
-    return user;
-  }
-
-  @ApiBearerAuth('access-token')
   @ApiResponse({ status: HttpStatus.CREATED, description: '주소 등록 성공' })
-  @Post('/createUserAddress')
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
+  @Post('/address')
   async createUserAddress(
     @Body() userAddress: CreateUserAddressDto,
     @GetUser() user: User,
@@ -61,14 +57,18 @@ export class UserController {
     return {
       message: '주소 등록 성공',
       result: 'Success',
-      statusCode: 201,
+      statusCode: HttpStatus.CREATED,
     };
   }
 
   @ApiResponse({ status: HttpStatus.OK, description: '주소 삭제 성공' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '이미 존재하지 않는 주소',
+  })
   @ApiBearerAuth('access-token')
-  @Delete('/deleteUserAddress/:id')
   @UseGuards(JwtAuthGuard)
+  @Delete('/address/:id')
   async deleteUserAddress(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
@@ -83,8 +83,8 @@ export class UserController {
 
   @ApiResponse({ status: HttpStatus.OK, description: '주소 조회 성공' })
   @ApiBearerAuth('access-token')
-  @Get('/getUserAddressById')
   @UseGuards(JwtAuthGuard)
+  @Get('/address')
   async getUserAddressById(
     @GetUser() user: User,
   ): Promise<UserAddressEntity[]> {
@@ -92,18 +92,22 @@ export class UserController {
   }
 
   @ApiResponse({ status: HttpStatus.OK, description: '주소 변경 성공' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '존재하지 않거나 접근 권한이 없음.',
+  })
   @ApiBearerAuth('access-token')
-  @Patch('/updateUserAddressById')
   @UseGuards(JwtAuthGuard)
+  @Patch('/address')
   async updateUserAddressById(
-    @Body() body: UpdateUserAddressDto,
+    @Body() addressInfo: UpdateUserAddressDto,
     @GetUser() user: User,
   ): Promise<DefaultResponseDto> {
-    await this.userService.updateUserAddressById(body, user.id);
+    await this.userService.updateUserAddressById(addressInfo, user.id);
     return {
       message: '주소 변경 성공',
       result: 'updated',
-      statusCode: 200,
+      statusCode: HttpStatus.OK,
     };
   }
 
@@ -115,13 +119,16 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: '인증 실패' })
   @ApiBearerAuth('access-token')
   @ApiBody({ type: BusinessLicenseDto })
-  @Post('/createBusinessLicense')
   @UseGuards(JwtAuthGuard)
+  @Post('/businessLicense')
   async createBusinessLicense(
-    @Body() body: BusinessLicenseDto,
+    @Body() businessLicenceInfo: BusinessLicenseDto,
     @GetUser() user: User,
   ): Promise<DefaultResponseDto> {
-    await this.userService.createBusinessLicense(body.businessId, user.id);
+    await this.userService.createBusinessLicense(
+      businessLicenceInfo.businessId,
+      user.id,
+    );
     return {
       message: '[사업자 등록 정보] 등록 성공',
       result: 'success',
@@ -131,8 +138,8 @@ export class UserController {
 
   @ApiResponse({ status: HttpStatus.OK, description: '사업자 정보 반환 성공' })
   @ApiBearerAuth('access-token')
-  @Get('/getUserBusinessLicense')
   @UseGuards(JwtAuthGuard)
+  @Get('/businessLicense')
   async getUserBusinessLicense(
     @GetUser() user: User,
   ): Promise<{ businessId: string; createdAt: Date }[]> {
@@ -140,9 +147,13 @@ export class UserController {
   }
 
   @ApiResponse({ status: HttpStatus.OK, description: '사업자 정보 삭제 성공' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '삭제할 사업자 등록번호를 찾을 수 없습니다.',
+  })
   @ApiBearerAuth('access-token')
-  @Delete('/deleteUserBusinessLicense/:id')
   @UseGuards(JwtAuthGuard)
+  @Delete('/businessLicense/:id')
   async deleteUserBusinessLicense(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
