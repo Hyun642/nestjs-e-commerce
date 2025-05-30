@@ -10,18 +10,18 @@ import {
   Param,
   ParseIntPipe,
 } from '@nestjs/common';
-import { UserService } from '../service/user.service';
-import { SignUpDto } from '../dto/signup.dto';
-import { LogInDto } from '../dto/login.dto';
-import { GetUser } from '../get-user.decorator';
+import { UserService } from './user.service';
+import { SignUpDto } from './dto/signup.dto';
+import { LogInDto } from './dto/login.dto';
+import { GetUser } from './get-user.decorator';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
-import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
+import { CreateUserAddressDto } from './dto/address/createUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
-import { BusinessLicenseDto } from '../dto/businessLicense/businessLicense.dto';
-import { UserAddressEntity } from '../dto/entity/userAddress.entity';
-import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
+import { BusinessLicenseDto } from './dto/businessLicense/businessLicense.dto';
+import { UserAddressEntity } from './entity/userAddress.entity';
+import { UpdateUserAddressDto } from './dto/address/updateUserAddress.dto';
 
 @Controller('user')
 export class UserController {

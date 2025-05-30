@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../repository/user.repository';
-import { SignUpDto } from '../dto/signup.dto';
-import { LogInDto } from '../dto/login.dto';
-import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
-import { UserAddressEntity } from '../dto/entity/userAddress.entity';
-import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
+import { UserRepository } from './user.repository';
+import { SignUpDto } from './dto/signup.dto';
+import { LogInDto } from './dto/login.dto';
+import { CreateUserAddressDto } from './dto/address/createUserAddress.dto';
+import { UserAddressEntity } from './entity/userAddress.entity';
+import { UpdateUserAddressDto } from './dto/address/updateUserAddress.dto';
 
 @Injectable()
 export class UserService {
