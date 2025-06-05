@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CartRepository } from './cart.repository';
 import { AddCartItem } from './dto/addCartIem.dto';
-import { CartItemWithOptionUnits } from './dto/cartItem.type';
+import { CartItemWithOptionUnitsDto } from './dto/cartItem.type';
 
 @Injectable()
 export class CartService {
@@ -11,7 +11,7 @@ export class CartService {
     await this.cartRepository.addCartItem(itemInfo, userId);
   }
 
-  async getMyCartItems(userId: string): Promise<CartItemWithOptionUnits[]> {
+  async getMyCartItems(userId: string): Promise<CartItemWithOptionUnitsDto[]> {
     return await this.cartRepository.getMyCartItems(userId);
   }
 
