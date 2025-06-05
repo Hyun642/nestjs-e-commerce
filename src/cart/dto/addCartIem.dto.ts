@@ -1,5 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { CartEntity } from './entity/cart.entity';
+import { CartEntity } from '../entity/cart.entity';
 import { IsArray, IsNotEmpty } from 'class-validator';
 
 export class AddCartItem extends PickType(CartEntity, [
