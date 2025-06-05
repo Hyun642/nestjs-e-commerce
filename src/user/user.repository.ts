@@ -110,13 +110,14 @@ export class UserRepository {
   }
 
   async updateUserAddressById(
+    userAddressId: number,
     addressInfo: UpdateUserAddressDto,
     userId: string,
   ): Promise<void> {
     const info = await this.prisma.userAddress.findUnique({
       where: {
         userId,
-        id: addressInfo.id,
+        id: userAddressId,
         deletedAt: null,
       },
     });
@@ -127,7 +128,7 @@ export class UserRepository {
     await this.prisma.userAddress.update({
       where: {
         userId,
-        id: addressInfo.id,
+        id: userAddressId,
       },
       data: {
         name: addressInfo.name,

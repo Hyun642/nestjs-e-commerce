@@ -38,10 +38,15 @@ export class UserService {
   }
 
   async updateUserAddressById(
+    userAddressId: number,
     addressInfo: UpdateUserAddressDto,
     userId: string,
   ): Promise<void> {
-    return await this.userRepository.updateUserAddressById(addressInfo, userId);
+    return await this.userRepository.updateUserAddressById(
+      userAddressId,
+      addressInfo,
+      userId,
+    );
   }
 
   async createBusinessLicense(
