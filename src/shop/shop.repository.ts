@@ -23,17 +23,17 @@ export class ShopRepository {
   }
 
   async getMyShopList(userId: string): Promise<GetShopInfoDto[] | null> {
-    const shops = await this.prisma.shop.findMany({
+    return await this.prisma.shop.findMany({
       where: {
         userId,
         deletedAt: null,
       },
+      select: {
+        name: true,
+        description: true,
+        createdAt: true,
+      },
     });
-    return shops.map((shop) => ({
-      name: shop.name,
-      description: shop.description,
-      createdAt: shop.createdAt,
-    }));
   }
 
   async getShopById(shopId: string): Promise<GetShopInfoDto | null> {
@@ -42,14 +42,15 @@ export class ShopRepository {
         id: shopId,
         deletedAt: null,
       },
+      select: {
+        name: true,
+        description: true,
+        createdAt: true,
+      },
     });
     if (!shop) throw new NotFoundException('상점이 존재하지 않습니다.');
 
-    return {
-      name: shop.name,
-      description: shop.description,
-      createdAt: shop.createdAt,
-    };
+    return shop;
   }
 
   async updateMyShopById(

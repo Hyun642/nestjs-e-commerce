@@ -20,15 +20,20 @@ import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { GetShopInfoDto } from './dto/getShopInfo.dto';
 import { SearchDto } from '../common/dto/search.dto';
 import { SearchShopDto } from './dto/searchShop.dto';
-@Controller('shop')
+
+@Controller('shops')
 export class ShopController {
   constructor(private readonly shopService: ShopService) {}
 
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: '상점 등록 성공',
+    type: DefaultResponseDto,
+  })
   @ApiBearerAuth('access-token')
-  @ApiResponse({ status: HttpStatus.CREATED, description: '상점 등록 성공' })
   @ApiBody({ type: CreateShopDto })
   @UseGuards(JwtAuthGuard)
-  @Post('/createShop')
+  @Post('/')
   async createShop(
     @Body() shopInfo: CreateShopDto,
     @GetUser() user: User,
@@ -41,10 +46,14 @@ export class ShopController {
     };
   }
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상점 조회 성공',
+    type: GetShopInfoDto,
+  })
   @ApiBearerAuth('access-token')
-  @ApiResponse({ status: HttpStatus.OK, description: '상점 조회 성공' })
-  @Get('/getMyShopList')
   @UseGuards(JwtAuthGuard)
+  @Get('/me/shops')
   async getMyShopList(@GetUser() user: User): Promise<GetShopInfoDto[] | null> {
     return this.shopService.getMyShopList(user.id);
   }
@@ -52,18 +61,32 @@ export class ShopController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'ShopId로 상점 조회 성공',
+    type: GetShopInfoDto,
   })
-  @Get('/getShopById/:shopId')
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '상점이 존재하지 않습니다.',
+  })
+  @Get('/:shopId')
   async getShopById(
     @Param('shopId') shopId: string,
   ): Promise<GetShopInfoDto | null> {
     return this.shopService.getShopById(shopId);
   }
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상점 업데이트 성공',
+    type: DefaultResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '상점이 존재하지 않습니다.',
+  })
+  @ApiBody({ type: CreateShopDto })
   @ApiBearerAuth('access-token')
-  @ApiResponse({ status: HttpStatus.OK, description: '상점 업데이트 성공' })
-  @Patch('/updateMyShopById/:shopId')
   @UseGuards(JwtAuthGuard)
+  @Patch('/:shopId')
   async updateMyShopById(
     @Param('shopId') shopId: string,
     @Body() body: CreateShopDto,
@@ -78,9 +101,14 @@ export class ShopController {
   }
 
   @ApiBearerAuth('access-token')
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '상점이 존재하지 않습니다.',
+    type: DefaultResponseDto,
+  })
   @ApiResponse({ status: HttpStatus.OK, description: '상점 삭제 성공' })
-  @Delete('/deleteMyShopById/:shopId')
   @UseGuards(JwtAuthGuard)
+  @Delete('/:shopId')
   async deleteMyShopById(
     @Param('shopId') shopId: string,
     @GetUser() user: User,
@@ -93,7 +121,11 @@ export class ShopController {
     };
   }
 
-  @ApiResponse({ status: HttpStatus.OK, description: '상점 검색 성공' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상점 검색 성공',
+    type: SearchShopDto,
+  })
   @Get('/search')
   async searchShop(@Query() query: SearchDto): Promise<SearchShopDto> {
     return await this.shopService.searchShop(query);
