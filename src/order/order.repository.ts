@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { OrderDto } from './dto/orderitems.dto';
@@ -14,26 +13,30 @@ export class OrderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async order(orderInfo: OrderDto, userId: string): Promise<void> {
-    const { orderStatus, userAddressId } = orderInfo;
-    const newOrder = await this.prisma.order.create({
-      data: {
-        userId,
-        userAddressId,
-        orderStatus,
-      },
+    const { orderStatus, userAddressId, orderItems } = orderInfo;
+
+    if (orderItems.length === 0) {
+      throw new BadRequestException('최소 1개 이상의 주문 항목이 필요합니다.');
+    }
+
+    await this.prisma.$transaction(async () => {
+      const newOrder = await this.prisma.order.create({
+        data: {
+          userId,
+          userAddressId,
+          orderStatus,
+        },
+      });
+
+      await this.prisma.orderItem.createMany({
+        data: orderInfo.orderItems.map((item) => ({
+          orderId: newOrder.id,
+          productId: item.productId,
+          productOptionUnitId: item.productOptionUnitId,
+          quantity: item.quantity,
+        })),
+      });
     });
-    await Promise.all(
-      orderInfo.orderItems.map((item) =>
-        this.prisma.orderItem.create({
-          data: {
-            orderId: newOrder.id,
-            productId: item.productId,
-            productOptionUnitId: item.productOptionUnitId,
-            quantity: item.quantity,
-          },
-        }),
-      ),
-    );
   }
 
   async refund(orderId: string, userId: string): Promise<void> {
@@ -55,15 +58,12 @@ export class OrderRepository {
       throw new BadRequestException('해당 상태에서는 환불이 불가합니다.');
     }
 
-    const updatedOrder = await this.prisma.order.updateMany({
+    await this.prisma.order.update({
       where: { id: orderId, userId },
       data: {
         orderStatus: '환불진행',
       },
     });
-
-    if (updatedOrder.count === 0)
-      throw new NotFoundException('해당 주문을 찾을 수 없습니다.');
   }
 
   async return(orderId: string, userId: string): Promise<void> {
@@ -81,15 +81,12 @@ export class OrderRepository {
       throw new BadRequestException('해당 상태에서는 반품이 불가합니다.');
     }
 
-    const updatedOrder = await this.prisma.order.updateMany({
+    await this.prisma.order.update({
       where: { id: orderId, userId },
       data: {
         orderStatus: '반품진행',
       },
     });
-
-    if (updatedOrder.count === 0)
-      throw new NotFoundException('해당 주문을 찾을 수 없습니다.');
   }
 
   async getOrdersByUserId(

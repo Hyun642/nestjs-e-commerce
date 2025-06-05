@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { GetUser } from 'src/user/get-user.decorator';
 import { User } from '@prisma/client';
 import { OrderDto } from './dto/orderitems.dto';
@@ -19,10 +19,16 @@ import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { PaginationDto } from 'src/common/dto/paginationDto';
 import { OrderListResponseDto } from './dto/orderListResponse.dto';
 
-@Controller('order')
+@Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: '주문 성공',
+    type: DefaultResponseDto,
+  })
+  @ApiBody({ type: OrderDto })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Post('/')
@@ -39,6 +45,19 @@ export class OrderController {
     };
   }
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '환불 요청 성공',
+    type: DefaultResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: '해당 주문에 대한 권한이 없거나 존재하지 않습니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: '해당 상태에서는 환불이 불가합니다.',
+  })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Patch('/refund/:id')
@@ -54,6 +73,19 @@ export class OrderController {
     };
   }
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '반품 요청 성공',
+    type: DefaultResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: '해당 주문에 대한 권한이 없거나 존재하지 않습니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: '해당 상태에서는 반품이 불가합니다.',
+  })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Patch('/return/:id')
@@ -69,10 +101,10 @@ export class OrderController {
     };
   }
 
-  @ApiResponse({ status: 200, type: OrderListResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: OrderListResponseDto })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
-  @Get('/list')
+  @Get('/')
   async getOrdersByUserId(
     @Query() query: PaginationDto,
     @GetUser() user: User,
