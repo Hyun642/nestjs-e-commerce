@@ -1,6 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { ProductReviewEntity } from './entity/productReview.entity';
-import { productReviewImageEntity } from './entity/productReviewImage.entity';
+import { ProductReviewEntity } from '../entity/productReview.entity';
+import { productReviewImageEntity } from '../entity/productReviewImage.entity';
 
 class ProductReviewImageDto extends PickType(productReviewImageEntity, [
   'url',
