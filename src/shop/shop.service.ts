@@ -4,8 +4,6 @@ import { CreateShopDto } from './dto/createshop.dto';
 import { GetShopInfoDto } from './dto/getShopInfo.dto';
 import { SearchDto } from 'src/common/dto/search.dto';
 import { SearchShopDto } from './dto/searchShop.dto';
-import { ProductDto } from 'src/product/dto/createProduct.dto';
-import { ProductEntity } from 'src/product/dto/entity/product.entity';
 
 @Injectable()
 export class ShopService {
