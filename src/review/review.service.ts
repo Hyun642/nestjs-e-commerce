@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ReviewRepository } from './review.repository';
 import { CreateReviewDto } from './dto/createReview.dto';
-import { MyReviewItemList } from './dto/review-Response.dto';
+import { MyReviewItemListDto } from './dto/review-Response.dto';
 import { UpdateReviewDto } from './dto/updateReview.dto';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class ReviewService {
     await this.reviewRepository.createReview(reviewInfo, userId);
   }
 
-  async getMyReviewList(userId: string): Promise<MyReviewItemList[]> {
+  async getMyReviewList(userId: string): Promise<MyReviewItemListDto[]> {
     return await this.reviewRepository.getMyReviewList(userId);
   }
 

@@ -14,18 +14,24 @@ import { GetUser } from 'src/user/get-user.decorator';
 import { User } from '@prisma/client';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { CreateReviewDto } from './dto/createReview.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { MyReviewItemList } from './dto/review-Response.dto';
+import { MyReviewItemListDto } from './dto/review-Response.dto';
 import { UpdateReviewDto } from './dto/updateReview.dto';
 
-@Controller('review')
+@Controller('reviews')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: '리뷰 등록 성공',
+    type: DefaultResponseDto,
+  })
+  @ApiBody({ type: CreateReviewDto })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
-  @Post('/create')
+  @Post('/')
   async createReview(
     @Body() reviewInfo: CreateReviewDto,
     @GetUser() user: User,
@@ -38,16 +44,31 @@ export class ReviewController {
     };
   }
 
+  @ApiResponse({
+    status: 200,
+    description: '리뷰 리스트 반환',
+    type: MyReviewItemListDto,
+    isArray: true,
+  })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
-  @Get('/getMyReviewList')
-  async getMyReviewList(@GetUser() user: User): Promise<MyReviewItemList[]> {
+  @Get('/')
+  async getMyReviewList(@GetUser() user: User): Promise<MyReviewItemListDto[]> {
     return await this.reviewService.getMyReviewList(user.id);
   }
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '리뷰 삭제 성공',
+    type: DefaultResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '리뷰가 존재하지 않습니다.',
+  })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
-  @Delete('/deleteProductReview/:reviewId')
+  @Delete('/:reviewId')
   async deleteProductReview(
     @Param('reviewId') reviewId: number,
     @GetUser() user: User,
@@ -60,9 +81,19 @@ export class ReviewController {
     };
   }
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '리뷰 업데이트 성공',
+    type: DefaultResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '리뷰가 존재하지 않습니다.',
+  })
+  @ApiBody({ type: UpdateReviewDto })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
-  @Patch('/updateProductReview/:reviewId')
+  @Patch('/:reviewId')
   async updateProductReview(
     @Param('reviewId') reviewId: number,
     @GetUser() user: User,

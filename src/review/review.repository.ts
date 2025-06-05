@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { CreateReviewDto } from './dto/createReview.dto';
-import { MyReviewItemList } from './dto/review-Response.dto';
+import { MyReviewItemListDto } from './dto/review-Response.dto';
 import { UpdateReviewDto } from './dto/updateReview.dto';
 
 @Injectable()
@@ -14,32 +14,35 @@ export class ReviewRepository {
   ): Promise<void> {
     const { score, content, productId, orderItemId } = reviewInfo;
 
-    const newReview = await this.prisma.productReview.create({
-      data: {
-        userId,
-        productId,
-        orderItemId,
-        score,
-        content,
-      },
-    });
-    await Promise.all(
-      reviewInfo.url.map(({ url }) =>
-        this.prisma.productReviewImage.create({
-          data: {
+    await this.prisma.$transaction(async (tx) => {
+      const newReview = await tx.productReview.create({
+        data: {
+          userId,
+          productId,
+          orderItemId,
+          score,
+          content,
+        },
+      });
+      if (reviewInfo.url.length > 0) {
+        await tx.productReviewImage.createMany({
+          data: reviewInfo.url.map(({ url }) => ({
             productReviewId: newReview.id,
             url: url,
-          },
-        }),
-      ),
-    );
+          })),
+        });
+      }
+    });
   }
 
-  async getMyReviewList(userId: string): Promise<MyReviewItemList[]> {
-    return await this.prisma.productReview.findMany({
+  async getMyReviewList(userId: string): Promise<MyReviewItemListDto[]> {
+    return this.prisma.productReview.findMany({
       where: { userId, deletedAt: null },
       select: {
         id: true,
+        score: true,
+        content: true,
+        updatedAt: true,
         product: {
           select: {
             name: true,
@@ -48,24 +51,22 @@ export class ReviewRepository {
         },
         orderItem: {
           select: {
+            quantity: true,
             productOptionUnit: {
               select: {
                 name: true,
                 additionalPrice: true,
               },
             },
-            quantity: true,
           },
         },
-        score: true,
-        content: true,
-        updatedAt: true,
+
         productReviewImage: {
-          select: {
-            url: true,
-          },
           where: {
             deletedAt: null,
+          },
+          select: {
+            url: true,
           },
         },
       },
@@ -76,22 +77,20 @@ export class ReviewRepository {
   }
 
   async deleteProductReview(reviewId: number, userId: string): Promise<void> {
-    const review = await this.prisma.productReview.findUnique({
+    const result = await this.prisma.productReview.updateMany({
       where: {
         id: reviewId,
-      },
-    });
-    if (!review || review.userId !== userId || review.deletedAt !== null)
-      throw new NotFoundException('리뷰가 존재하지 않습니다.');
-
-    await this.prisma.productReview.update({
-      where: {
-        id: review.id,
+        userId,
+        deletedAt: null,
       },
       data: {
         deletedAt: new Date(),
       },
     });
+
+    if (result.count == 0) {
+      throw new NotFoundException('리뷰가 존재하지 않습니다.');
+    }
   }
 
   async updateProductReview(
@@ -99,41 +98,40 @@ export class ReviewRepository {
     reviewId: number,
     userId: string,
   ): Promise<void> {
-    const { score, content } = reviewInfo;
+    const { score, content, url } = reviewInfo;
 
-    const review = await this.prisma.productReview.findUnique({
-      where: {
-        id: reviewId,
-      },
-    });
+    await this.prisma.$transaction(async (tx) => {
+      const review = await tx.productReview.findUnique({
+        where: {
+          id: reviewId,
+        },
+      });
 
-    if (!review || review.userId !== userId || review.deletedAt !== null)
-      throw new NotFoundException('리뷰가 존재하지 않습니다.');
+      if (!review || review.userId !== userId || review.deletedAt !== null)
+        throw new NotFoundException('리뷰가 존재하지 않습니다.');
 
-    await this.prisma.$transaction([
-      this.prisma.productReview.update({
+      await tx.productReview.update({
         where: { id: review.id },
         data: {
           score,
           content,
         },
       }),
-
-      this.prisma.productReviewImage.updateMany({
-        where: { productReviewId: reviewId },
-        data: {
-          deletedAt: new Date(),
-        },
-      }),
-
-      ...reviewInfo.url.map(({ url }) =>
-        this.prisma.productReviewImage.create({
+        await tx.productReviewImage.updateMany({
+          where: { productReviewId: reviewId },
           data: {
-            productReviewId: review.id,
-            url: url,
+            deletedAt: new Date(),
           },
-        }),
-      ),
-    ]);
+        });
+
+      if (url.length > 0) {
+        await tx.productReviewImage.createMany({
+          data: url.map(({ url }) => ({
+            productReviewId: reviewId,
+            url,
+          })),
+        });
+      }
+    });
   }
 }
