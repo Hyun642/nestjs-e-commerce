@@ -17,22 +17,29 @@ import { GetUser } from 'src/user/get-user.decorator';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
-import { ProductEntity } from './dto/entity/product.entity';
 import {
-  ProductDetailResponse,
+  ProductDetailResponseDto,
   SearchProductDto,
 } from './dto/product-response.type';
 import { SearchDto } from 'src/common/dto/search.dto';
 
-@Controller('product')
+@Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: '상품 등록 성공',
+    type: DefaultResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '해당 상점에 대한 권한이 없거나 존재하지 않습니다.',
+  })
   @ApiBearerAuth('access-token')
-  @ApiResponse({ status: HttpStatus.CREATED, description: '상품 등록 성공' })
   @ApiBody({ type: ProductDto })
   @UseGuards(JwtAuthGuard)
-  @Post('/createProduct/:shopId')
+  @Post('/:shopId')
   async createProduct(
     @Param('shopId') shopId: string,
     @Body() product: ProductDto,
@@ -46,29 +53,34 @@ export class ProductController {
     };
   }
 
-  @ApiResponse({ status: HttpStatus.OK, description: '상품 리스트 조회 성공' })
-  @Get('/getProductList/:shopId')
-  async getProductList(
-    @Param('shopId') shopId: string,
-  ): Promise<ProductEntity[]> {
-    return await this.productService.getProductList(shopId);
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상품 상세 조회 성공',
+    type: ProductDetailResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '해당 상품이 존재하지 않습니다.',
+  })
+  @Get('/:productId')
+  async getProductDetail(
+    @Param('productId') productId: string,
+  ): Promise<ProductDetailResponseDto> {
+    return await this.productService.getProductDetail(productId);
   }
 
   @ApiResponse({
     status: HttpStatus.OK,
-    description: '상품 상세 조회 성공',
+    description: '상품 삭제 성공',
+    type: ProductDetailResponseDto,
   })
-  @Get('/getProductDetail/:productId')
-  async getProductDetail(
-    @Param('productId') productId: string,
-  ): Promise<ProductDetailResponse> {
-    return await this.productService.getProductDetail(productId);
-  }
-
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '해당 상점에 대한 권한이 없거나 존재하지 않습니다.',
+  })
   @ApiBearerAuth('access-token')
-  @ApiResponse({ status: HttpStatus.OK, description: '상품 삭제 성공' })
   @UseGuards(JwtAuthGuard)
-  @Delete('/deleteProduct/:shopId/:productId')
+  @Delete('/:shopId/products/:productId')
   async deleteProduct(
     @Param('productId') productId: string,
     @Param('shopId') shopId: string,
@@ -82,11 +94,19 @@ export class ProductController {
     };
   }
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상품 수정 성공',
+    type: ProductDetailResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '해당 상점에 대한 권한이 없거나 상품이 존재하지 않습니다.',
+  })
   @ApiBearerAuth('access-token')
-  @ApiResponse({ status: HttpStatus.OK, description: '상품 수정 성공' })
   @ApiBody({ type: ProductDto })
   @UseGuards(JwtAuthGuard)
-  @Patch('/updateProduct/:shopId/:productId')
+  @Patch('/:shopId/products/:productId')
   async updateProduct(
     @Param('productId') productId: string,
     @Param('shopId') shopId: string,
@@ -106,13 +126,21 @@ export class ProductController {
     };
   }
 
-  @ApiResponse({ status: HttpStatus.OK, description: '상품 검색 성공' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상품 검색 성공',
+    type: SearchProductDto,
+  })
   @Get('/search')
   async searchProduct(@Query() query: SearchDto): Promise<SearchProductDto> {
     return await this.productService.searchProduct(query);
   }
 
-  @ApiResponse({ status: HttpStatus.OK, description: '상품 검색 성공' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상품 검색 성공',
+    type: SearchProductDto,
+  })
   @Get('/search/:shopId')
   async searchProductInShop(
     @Query() query: SearchDto,

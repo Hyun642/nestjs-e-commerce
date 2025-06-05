@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
 import { ProductDto } from './dto/createProduct.dto';
-import { ProductEntity } from './dto/entity/product.entity';
 import {
-  ProductDetailResponse,
+  ProductDetailResponseDto,
   SearchProductDto,
 } from './dto/product-response.type';
 
@@ -25,80 +24,56 @@ export class ProductRepository {
       );
     }
 
-    const createdProduct = await this.prisma.product.create({
-      data: {
-        name: product.name,
-        price: product.price,
-        thumbnailImageUrl: product.thumbnailImageUrl,
-        description: product.description,
-        shop: {
-          connect: { id: shopId },
-        },
-      },
-    });
-
-    const productId = createdProduct.id;
-
-    await Promise.all(
-      product.image.map((img) =>
-        this.prisma.productImage.create({
-          data: {
-            url: img.url,
-            product: { connect: { id: productId } },
-          },
-        }),
-      ),
-    );
-
-    for (const option of product.option) {
-      const createdOption = await this.prisma.productOption.create({
+    await this.prisma.$transaction(async (tx) => {
+      const createdProduct = await tx.product.create({
         data: {
-          name: option.name,
-          stock: option.stock,
-          isRequired: option.isRequired,
-          product: {
-            connect: { id: productId },
+          name: product.name,
+          price: product.price,
+          thumbnailImageUrl: product.thumbnailImageUrl,
+          description: product.description,
+          shop: {
+            connect: { id: shopId },
           },
         },
       });
 
-      await Promise.all(
-        option.units.map((unit) =>
-          this.prisma.productOptionUnit.create({
-            data: {
-              name: unit.name,
-              stock: unit.stock,
-              additionalPrice: unit.additionalPrice,
-              productOption: {
-                connect: { id: createdOption.id },
-              },
-            },
-          }),
-        ),
-      );
-    }
-  }
+      const productId = createdProduct.id;
 
-  async getProductList(shopId: string): Promise<ProductEntity[]> {
-    const productList = await this.prisma.product.findMany({
-      where: {
-        shopId,
-        deletedAt: null,
-      },
-      select: {
-        id: true,
-        shopId: true,
-        name: true,
-        price: true,
-        description: true,
-        thumbnailImageUrl: true,
-        createdAt: true,
-      },
+      if (product.image.length > 0) {
+        await tx.productImage.createMany({
+          data: product.image.map((img) => ({
+            url: img.url,
+            productId,
+          })),
+        });
+      }
+
+      for (const option of product.option) {
+        const { id: optionId } = await tx.productOption.create({
+          data: {
+            name: option.name,
+            stock: option.stock,
+            isRequired: option.isRequired,
+            productId,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        await tx.productOptionUnit.createMany({
+          data: option.units.map((unit) => ({
+            name: unit.name,
+            stock: unit.stock,
+            additionalPrice: unit.additionalPrice,
+            productOptionId: optionId,
+          })),
+        });
+      }
     });
-    return productList;
   }
 
-  async getProductDetail(productId: string): Promise<ProductDetailResponse> {
+  async getProductDetail(productId: string): Promise<ProductDetailResponseDto> {
     const productInfo = await this.prisma.product.findFirst({
       where: {
         id: productId,
@@ -117,6 +92,27 @@ export class ProductRepository {
             productReview: true,
           },
         },
+        productImage: {
+          select: {
+            url: true,
+          },
+        },
+        productOption: {
+          select: {
+            id: true,
+            name: true,
+            stock: true,
+            isRequired: true,
+            productOptionUnit: {
+              select: {
+                id: true,
+                name: true,
+                stock: true,
+                additionalPrice: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -124,56 +120,7 @@ export class ProductRepository {
       throw new NotFoundException('해당 상품이 존재하지 않습니다.');
     }
 
-    const productImages = await this.prisma.productImage.findMany({
-      where: {
-        productId: productId,
-        deletedAt: null,
-      },
-      select: {
-        url: true,
-      },
-    });
-
-    const productOptions = await this.prisma.productOption.findMany({
-      where: {
-        productId: productId,
-        deletedAt: null,
-      },
-      select: {
-        id: true,
-        name: true,
-        stock: true,
-        isRequired: true,
-      },
-    });
-
-    const productOptionsWithUnits = await Promise.all(
-      productOptions.map(async (option) => {
-        const units = await this.prisma.productOptionUnit.findMany({
-          where: {
-            productOptionId: option.id,
-            deletedAt: null,
-          },
-          select: {
-            id: true,
-            name: true,
-            stock: true,
-            additionalPrice: true,
-          },
-        });
-
-        return {
-          ...option,
-          units,
-        };
-      }),
-    );
-
-    return {
-      productInfo,
-      productImages: productImages,
-      productOptionsWithUnits: productOptionsWithUnits,
-    };
+    return productInfo;
   }
 
   async deleteProduct(
@@ -183,6 +130,10 @@ export class ProductRepository {
   ): Promise<void> {
     const shop = await this.prisma.shop.findUnique({
       where: { id: shopId },
+      select: {
+        userId: true,
+        deletedAt: true,
+      },
     });
     if (!shop || shop.userId !== userId || shop.deletedAt !== null) {
       throw new NotFoundException(
@@ -214,7 +165,10 @@ export class ProductRepository {
     userId: string,
     updateData: ProductDto,
   ): Promise<void> {
-    const shop = await this.prisma.shop.findUnique({ where: { id: shopId } });
+    const shop = await this.prisma.shop.findUnique({
+      where: { id: shopId },
+      select: { userId: true, deletedAt: true },
+    });
     if (!shop || shop.userId !== userId || shop.deletedAt !== null) {
       throw new NotFoundException(
         '해당 상점에 대한 권한이 없거나 존재하지 않습니다.',
@@ -222,81 +176,69 @@ export class ProductRepository {
     }
 
     const product = await this.prisma.product.findFirst({
-      where: {
-        id: productId,
-        deletedAt: null,
-      },
+      where: { id: productId, deletedAt: null },
     });
     if (!product) throw new NotFoundException('상품이 존재하지 않습니다.');
 
     const { image, option, ...data } = updateData;
 
-    await this.prisma.product.update({
-      where: { id: productId },
-      data,
-    });
-
-    await this.prisma.productImage.updateMany({
-      where: { productId, deletedAt: null },
-      data: { deletedAt: new Date() },
-    });
-
-    await Promise.all(
-      image.map((img) =>
-        this.prisma.productImage.create({
-          data: {
-            url: img.url,
-            product: { connect: { id: productId } },
-          },
-        }),
-      ),
-    );
-
-    const previousOptions = await this.prisma.productOption.findMany({
-      where: { productId, deletedAt: null },
-      select: { id: true },
-    });
-
-    const previousOptionIds = previousOptions.map((opt) => opt.id);
-
-    await this.prisma.productOptionUnit.updateMany({
-      where: {
-        productOptionId: { in: previousOptionIds },
-        deletedAt: null,
-      },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
-
-    await this.prisma.productOption.updateMany({
-      where: { id: { in: previousOptionIds } },
-      data: { deletedAt: new Date() },
-    });
-
-    for (const opt of option) {
-      const createdOption = await this.prisma.productOption.create({
-        data: {
-          name: opt.name,
-          stock: opt.stock,
-          isRequired: opt.isRequired,
-          product: { connect: { id: productId } },
-        },
+    await this.prisma.$transaction(async (tx) => {
+      await tx.product.update({
+        where: { id: productId },
+        data,
       });
 
-      await Promise.all(
-        opt.units.map((unit) =>
-          this.prisma.productOptionUnit.create({
-            data: {
-              name: unit.name,
-              stock: unit.stock,
-              additionalPrice: unit.additionalPrice,
-              productOption: { connect: { id: createdOption.id } },
-            },
-          }),
-        ),
-      );
-    }
+      await tx.productImage.updateMany({
+        where: { productId, deletedAt: null },
+        data: { deletedAt: new Date() },
+      });
+
+      await tx.productImage.createMany({
+        data: image.map((img) => ({
+          url: img.url,
+          productId,
+        })),
+      });
+
+      const previousOptions = await tx.productOption.findMany({
+        where: { productId, deletedAt: null },
+        select: { id: true },
+      });
+      const previousOptionIds = previousOptions.map((opt) => opt.id);
+
+      await tx.productOptionUnit.updateMany({
+        where: {
+          productOptionId: { in: previousOptionIds },
+          deletedAt: null,
+        },
+        data: { deletedAt: new Date() },
+      });
+
+      await tx.productOption.updateMany({
+        where: { id: { in: previousOptionIds } },
+        data: { deletedAt: new Date() },
+      });
+
+      for (const opt of option) {
+        const createdOption = await tx.productOption.create({
+          data: {
+            name: opt.name,
+            stock: opt.stock,
+            isRequired: opt.isRequired,
+            product: { connect: { id: productId } },
+          },
+        });
+
+        await tx.productOptionUnit.createMany({
+          data: opt.units.map((unit) => ({
+            name: unit.name,
+            stock: unit.stock,
+            additionalPrice: unit.additionalPrice,
+            productOptionId: createdOption.id,
+          })),
+        });
+      }
+    });
   }
 
   async searchProduct(query: any): Promise<SearchProductDto> {

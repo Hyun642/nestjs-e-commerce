@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ProductRepository } from './product.repository';
 import { ProductDto } from './dto/createProduct.dto';
-import { ProductEntity } from './dto/entity/product.entity';
 import {
-  ProductDetailResponse,
+  ProductDetailResponseDto,
   SearchProductDto,
 } from './dto/product-response.type';
 
 @Injectable()
 export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
+
   async createProduct(
     shopId: string,
     userId: string,
@@ -18,11 +18,7 @@ export class ProductService {
     await this.productRepository.createProduct(shopId, userId, product);
   }
 
-  async getProductList(shopId: string): Promise<ProductEntity[]> {
-    return await this.productRepository.getProductList(shopId);
-  }
-
-  async getProductDetail(productId: string): Promise<ProductDetailResponse> {
+  async getProductDetail(productId: string): Promise<ProductDetailResponseDto> {
     return await this.productRepository.getProductDetail(productId);
   }
 
