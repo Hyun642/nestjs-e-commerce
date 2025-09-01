@@ -27,6 +27,7 @@ model User {
   businessLicense BusinessLicense[]
   shop Shop[]
   productReview ProductReview[]
+  cartItem CartItem[]
 }
 
 model UserAddress {
@@ -73,6 +74,7 @@ model Product{
   productOption ProductOption[]
   productImage ProductImage[]
   productReview ProductReview[]
+  cartItem CartItem[]
 }
 
 model ProductImage{
@@ -104,6 +106,7 @@ model ProductOptionUnit{
   stock Int
   additionalPrice Int
   deletedAt DateTime? @db.Timestamp(3)
+  cartItemOptionUnit CartItemOptionUnit[]
 }
 
 model ProductReview {
@@ -128,6 +131,23 @@ model ProductReviewImage{
   deletedAt DateTime? @db.Timestamp(3)
 }
 
-// model Cart{}
-// model CartProduct{}
-// model Order{}
+model CartItem{
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  product Product @relation(fields: [productId], references: [id])
+  productId  String
+  quantity Int
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  deletedAt DateTime? @db.Timestamp(3)
+  cartItemOptionUnit CartItemOptionUnit[]
+}
+
+model CartItemOptionUnit{
+  cartItem CartItem @relation(fields: [cartItemId],references: [id])
+  cartItemId Int
+  productionOptionUnit ProductOptionUnit @relation(fields: [productOptionUnitId], references: [id])
+  productOptionUnitId Int
+
+  @@id([cartItemId,productOptionUnitId])
+}
