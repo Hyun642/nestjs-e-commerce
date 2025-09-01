@@ -112,6 +112,11 @@ export class ProductRepository {
         description: true,
         thumbnailImageUrl: true,
         createdAt: true,
+        _count: {
+          select: {
+            productReview: true,
+          },
+        },
       },
     });
 
