@@ -16,6 +16,6 @@ import { PassportModule } from '@nestjs/passport';
       signOptions: { expiresIn: 60 * 60 * 24 * 365 }, //1년
     }),
   ],
-  exports: [JwtStrategy],
+  exports: [JwtStrategy, JwtModule],
 })
 export class UserModule {}

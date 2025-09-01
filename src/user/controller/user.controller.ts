@@ -19,7 +19,6 @@ import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
-import { DeleteUserAddressDto } from '../dto/address/deleteUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { BusinessLicenseDto } from '../dto/businessLicense/businessLicense.dto';
 import { UserAddressEntity } from '../dto/entity/userAddress.entity';
@@ -91,7 +90,7 @@ export class UserController {
   ): Promise<UserAddressEntity[]> {
     return await this.userService.getUserAddressById(user.id);
   }
-  
+
   @ApiResponse({ status: HttpStatus.OK, description: '주소 변경 성공' })
   @ApiBearerAuth('access-token')
   @Patch('/updateUserAddressById')
@@ -153,6 +152,6 @@ export class UserController {
       message: '[사업자 등록 정보] 제거 성공',
       result: 'success',
       statusCode: HttpStatus.OK,
-     };
+    };
   }
 }
