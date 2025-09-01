@@ -17,10 +17,11 @@ import { LogInDto } from '../dto/login.dto';
 import { GetUser } from '../get-user.decorator';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { CreateUserAddressDto } from '../dto/address/createUserAddress.dto';
 import { DeleteUserAddressDto } from '../dto/address/deleteUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
+import { BusinessLicenseDto } from '../dto/businessLicense/businessLicense.dto';
 import { UserAddressEntity } from '../dto/entity/userAddress.entity';
 import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
 
@@ -77,7 +78,7 @@ export class UserController {
     return {
       message: '주소 삭제 성공',
       result: 'Success',
-      statusCode: 200,
+      statusCode: HttpStatus.OK,
     };
   }
 
@@ -90,7 +91,7 @@ export class UserController {
   ): Promise<UserAddressEntity[]> {
     return await this.userService.getUserAddressById(user.id);
   }
-
+  
   @ApiResponse({ status: HttpStatus.OK, description: '주소 변경 성공' })
   @ApiBearerAuth('access-token')
   @Patch('/updateUserAddressById')
@@ -105,5 +106,53 @@ export class UserController {
       result: 'updated',
       statusCode: 200,
     };
+  }
+
+  @ApiResponse({ status: HttpStatus.CREATED, description: '사업자 등록 성공' })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: '사업자 등록 번호 누락',
+  })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: '인증 실패' })
+  @ApiBearerAuth('access-token')
+  @ApiBody({ type: BusinessLicenseDto })
+  @Post('/createBusinessLicense')
+  @UseGuards(JwtAuthGuard)
+  async createBusinessLicense(
+    @Body() body: BusinessLicenseDto,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.userService.createBusinessLicense(body.businessId, user.id);
+    return {
+      message: '[사업자 등록 정보] 등록 성공',
+      result: 'success',
+      statusCode: HttpStatus.CREATED,
+    };
+  }
+
+  @ApiResponse({ status: HttpStatus.OK, description: '사업자 정보 반환 성공' })
+  @ApiBearerAuth('access-token')
+  @Get('/getUserBusinessLicense')
+  @UseGuards(JwtAuthGuard)
+  async getUserBusinessLicense(
+    @GetUser() user: User,
+  ): Promise<{ businessId: string; createdAt: Date }[]> {
+    return await this.userService.getUserBusinessLicense(user.id);
+  }
+
+  @ApiResponse({ status: HttpStatus.OK, description: '사업자 정보 삭제 성공' })
+  @ApiBearerAuth('access-token')
+  @Delete('/deleteUserBusinessLicense/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteUserBusinessLicense(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<DefaultResponseDto> {
+    await this.userService.deleteUserBusinessLicense(id, user.id);
+    return {
+      message: '[사업자 등록 정보] 제거 성공',
+      result: 'success',
+      statusCode: HttpStatus.OK,
+     };
   }
 }
