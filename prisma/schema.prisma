@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+//TODO: Index 최적화
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus{
+  결제완료
+  배송중
+  도착
+  환불진행
+  환불완료
+  반품진행
+  반품완료 
+}
+
+enum ReviewScore{
+  ONE
+  TWO
+  THREE
+  FOUR
+  FIVE
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique @db.VarChar(50)
+  password String @db.VarChar(60)
+  name String @db.VarChar(10)
+  phoneNumber String @db.VarChar(20)
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  updatedAt DateTime @db.Timestamp(3) @updatedAt()
+  deletedAt DateTime? @db.Timestamp(3)
+  userAddress UserAddress[]
+  businessLicense BusinessLicense[]
+  shop Shop[]
+  productReview ProductReview[]
+  cartItem CartItem[]
+  order Order[]
+}
+
+model UserAddress {
+  id Int @id  @default(autoincrement())
+  user User @relation(fields: [userId],references: [id])
+  userId String
+  name String
+  address String
+  deletedAt DateTime? @db.Timestamp(3)
+  order Order[]
+}
+
+model BusinessLicense {
+  id Int @id  @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId String 
+  businessId String
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  deletedAt DateTime? @db.Timestamp(3)
+}
+
+model Shop{
+  id String @id  @default(uuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  name String @db.VarChar(50)
+  description String
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  updatedAt DateTime @db.Timestamp(3) @updatedAt()
+  deletedAt DateTime? @db.Timestamp(3)
+  product Product[]
+}
+
+model Product{
+  id String @id  @default(uuid())
+  shop Shop @relation(fields: [shopId], references: [id])
+  shopId String
+  thumbnailImageUrl String
+  name String @db.VarChar(20)
+  description String @db.VarChar(30)
+  price Int  
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  updatedAt DateTime @db.Timestamp(3) @updatedAt()
+  deletedAt DateTime? @db.Timestamp(3)
+  productOption ProductOption[]
+  productImage ProductImage[]
+  productReview ProductReview[]
+  cartItem CartItem[]
+  orderItem OrderItem[]
+}
+
+model ProductImage{
+  id Int @id  @default(autoincrement())
+  product Product @relation(fields: [productId],references: [id])
+  productId String
+  url String
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  deletedAt DateTime? @db.Timestamp(3)
+}
+
+model ProductOption{
+  id Int @id  @default(autoincrement())
+  product Product @relation(fields: [productId],references: [id])
+  productId String
+  name String @db.VarChar(30)
+  stock Int
+  isRequired Boolean
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  deletedAt DateTime? @db.Timestamp(3)
+  productOptionUnit ProductOptionUnit[]
+}
+
+model ProductOptionUnit{
+  id Int @id  @default(autoincrement())
+  productOption ProductOption @relation(fields: [productOptionId], references: [id])
+  productOptionId Int
+  name String @db.VarChar(30)
+  stock Int
+  additionalPrice Int
+  deletedAt DateTime? @db.Timestamp(3)
+  cartItemOptionUnit CartItemOptionUnit[]
+  orderItem OrderItem[]
+}
+
+model ProductReview {
+  id Int @id @default(autoincrement())
+  product Product @relation(fields: [productId],references: [id])
+  productId String 
+  user User @relation(fields: [userId],references: [id])
+  userId String 
+  orderItem OrderItem @relation(fields: [orderItemId],references: [id])
+  orderItemId Int
+  score ReviewScore 
+  content String @db.VarChar(100)
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  updatedAt DateTime @db.Timestamp(3) @updatedAt()
+  deletedAt DateTime? @db.Timestamp(3)
+  productReviewImage ProductReviewImage[]
+}
+
+model ProductReviewImage{
+  id Int @id  @default(autoincrement())
+  productReview ProductReview @relation(fields: [productReviewId],references: [id])
+  productReviewId Int 
+  url String 
+  deletedAt DateTime? @db.Timestamp(3)
+}
+
+model CartItem{
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  product Product @relation(fields: [productId], references: [id])
+  productId  String
+  quantity Int
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  deletedAt DateTime? @db.Timestamp(3)
+  cartItemOptionUnit CartItemOptionUnit[]
+}
+
+model CartItemOptionUnit{
+  cartItem CartItem @relation(fields: [cartItemId],references: [id])
+  cartItemId Int
+  productionOptionUnit ProductOptionUnit @relation(fields: [productOptionUnitId], references: [id])
+  productOptionUnitId Int
+
+  @@id([cartItemId,productOptionUnitId])
+
+}
+
+model Order{
+  id String @id @default(uuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  userAddress UserAddress @relation(fields: [userAddressId], references: [id])
+  userAddressId Int
+  orderStatus OrderStatus
+  createdAt DateTime @db.Timestamp(3) @default(now())
+  canceledAt DateTime? @db.Timestamp(3)
+  deletedAt DateTime? @db.Timestamp(3)
+  orderItem OrderItem[]
+  }
+
+model OrderItem{
+  id Int @id @default(autoincrement())
+  order Order @relation(fields: [orderId], references: [id])
+  orderId String
+  product Product @relation(fields: [productId], references: [id])
+  productId String
+  productOptionUnit ProductOptionUnit @relation(fields: [productOptionUnitId], references: [id])
+  productOptionUnitId Int
+  quantity Int
+  
+  productReview ProductReview[]
+}
