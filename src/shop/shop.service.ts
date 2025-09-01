@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ShopRepository } from './shop.repository';
 import { CreateShopDto } from './dto/createshop.dto';
 import { GetShopInfoDto } from './dto/getShopInfo.dto';
+import { SearchDto } from 'src/common/dto/search.dto';
 import { SearchShopDto } from './dto/searchShop.dto';
 
 @Injectable()
@@ -31,7 +32,7 @@ export class ShopService {
     await this.shopRepository.deleteMyShopById(shopId, userId);
   }
 
-  async searchShop(query: SearchShopDto): Promise<any> {
+  async searchShop(query: SearchDto): Promise<SearchShopDto> {
     return await this.shopRepository.searchShop(query);
   }
 }

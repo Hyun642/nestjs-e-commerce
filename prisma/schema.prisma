@@ -66,6 +66,7 @@ model Product{
   thumbnailImageUrl String
   name String @db.VarChar(20)
   description String @db.VarChar(30)
+  price Int  
   createdAt DateTime @db.Timestamp(3) @default(now())
   updatedAt DateTime @db.Timestamp(3) @updatedAt()
   deletedAt DateTime? @db.Timestamp(3)
@@ -88,7 +89,6 @@ model ProductOption{
   product Product @relation(fields: [productId],references: [id])
   productId String
   name String @db.VarChar(30)
-  price Int
   stock Int
   isRequired Boolean
   createdAt DateTime @db.Timestamp(3) @default(now())
@@ -102,6 +102,7 @@ model ProductOptionUnit{
   productOptionId Int
   name String @db.VarChar(30)
   stock Int
+  additionalPrice Int
   deletedAt DateTime? @db.Timestamp(3)
 }
 

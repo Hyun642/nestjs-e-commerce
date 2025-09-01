@@ -10,7 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { CreateShopDto } from './dto/createshop.dto';
 import { GetUser } from 'src/user/get-user.decorator';
@@ -18,6 +18,7 @@ import { User } from '@prisma/client';
 import { ShopService } from './shop.service';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { GetShopInfoDto } from './dto/getShopInfo.dto';
+import { SearchDto } from '../common/dto/search.dto';
 import { SearchShopDto } from './dto/searchShop.dto';
 @Controller('shop')
 export class ShopController {
@@ -94,7 +95,7 @@ export class ShopController {
 
   @ApiResponse({ status: HttpStatus.OK, description: '상점 검색 성공' })
   @Get('/search')
-  async searchShop(@Query() query: SearchShopDto): Promise<any> {
+  async searchShop(@Query() query: SearchDto): Promise<SearchShopDto> {
     return await this.shopService.searchShop(query);
   }
 }
