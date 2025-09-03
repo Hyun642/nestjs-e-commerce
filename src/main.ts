@@ -6,6 +6,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('e-commerce')
     .setDescription('e-commerce API description')
@@ -28,7 +34,7 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks();
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
-  Logger.log(`App running on port 3000`);
+  await app.listen(3001);
+  Logger.log(`App running on port 3001`);
 }
 bootstrap();
