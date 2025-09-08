@@ -31,8 +31,13 @@ export class UserController {
   @ApiResponse({ status: 201, description: '회원가입 성공' })
   @ApiResponse({ status: 409, description: '중복 에러' })
   @Post('/signup')
-  async signUp(@Body() user: SignUpDto): Promise<SignUpDto> {
-    return await this.userService.signUp(user);
+  async signUp(@Body() user: SignUpDto): Promise<DefaultResponseDto> {
+    await this.userService.signUp(user);
+    return {
+      message: '회원가입 성공',
+      result: 'Success',
+      statusCode: 201,
+    };
   }
 
   @ApiResponse({ status: 201, description: '로그인 성공' })

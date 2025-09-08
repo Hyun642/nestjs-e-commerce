@@ -10,7 +10,7 @@ import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async signUp(user: SignUpDto): Promise<SignUpDto> {
+  async signUp(user: SignUpDto): Promise<void> {
     const res = await this.userRepository.signUp(user);
     return res;
   }
@@ -36,14 +36,14 @@ export class UserService {
   async getUserAddressById(userId: string): Promise<UserAddressEntity[]> {
     return await this.userRepository.getUserAddressById(userId);
   }
-    
+
   async updateUserAddressById(
     body: UpdateUserAddressDto,
     userId: string,
   ): Promise<void> {
     return await this.userRepository.updateUserAddressById(body, userId);
   }
-  
+
   async createBusinessLicense(
     businessId: string,
     userId: string,
@@ -59,5 +59,5 @@ export class UserService {
 
   async deleteUserBusinessLicense(id: number, userId: string): Promise<void> {
     return await this.userRepository.deleteUserBusinessLicense(id, userId);
-   }
+  }
 }
