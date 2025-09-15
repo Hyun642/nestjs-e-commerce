@@ -10,7 +10,7 @@ import { UpdateUserAddressDto } from './dto/address/updateUserAddress.dto';
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async signUp(user: SignUpDto): Promise<SignUpDto> {
+  async signUp(user: SignUpDto): Promise<void> {
     const res = await this.userRepository.signUp(user);
     return res;
   }

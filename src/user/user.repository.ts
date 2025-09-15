@@ -21,18 +21,21 @@ export class UserRepository {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signUp(user: SignUpDto): Promise<SignUpDto> {
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: user.email },
+  async signUp(user: SignUpDto): Promise<void> {
+    const existingUser = await this.prisma.user.findFirst({
+      where: { OR: [{ email: user.email }, { phoneNumber: user.phoneNumber }] },
     });
-    if (existingUser) {
+    if (existingUser && existingUser.email === user.email) {
       throw new ConflictException('이미 등록된 이메일 입니다.');
+    }
+    if (existingUser && existingUser.phoneNumber === user.phoneNumber) {
+      throw new ConflictException('이미 등록된 번호 입니다.');
     }
 
     const saltOrRounds = 10;
     const hashedPassword = await bcrypt.hash(user.password, saltOrRounds);
 
-    const res = await this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         email: user.email,
         name: user.name,
@@ -40,7 +43,6 @@ export class UserRepository {
         phoneNumber: user.phoneNumber,
       },
     });
-    return res;
   }
 
   async logIn(input: LogInDto): Promise<{ accessToken: string }> {

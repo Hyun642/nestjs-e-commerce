@@ -37,7 +37,7 @@ model User {
   email String @unique @db.VarChar(50)
   password String @db.VarChar(60)
   name String @db.VarChar(10)
-  phoneNumber String @db.VarChar(20)
+  phoneNumber String @unique @db.VarChar(20)
   createdAt DateTime @db.Timestamp(3) @default(now())
   updatedAt DateTime @db.Timestamp(3) @updatedAt()
   deletedAt DateTime? @db.Timestamp(3)

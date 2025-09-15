@@ -19,9 +19,10 @@ import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { CreateUserAddressDto } from './dto/address/createUserAddress.dto';
 import { DefaultResponseDto } from 'src/common/dto/response.dto';
-import { BusinessLicenseDto } from './dto/businessLicense/businessLicense.dto';
 import { UserAddressEntity } from './entity/userAddress.entity';
 import { UpdateUserAddressDto } from './dto/address/updateUserAddress.dto';
+import { BusinessLicenseDto } from './dto/businessLicense/businessLicense.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
 
 @Controller('users')
 export class UserController {
@@ -34,8 +35,12 @@ export class UserController {
   })
   @ApiResponse({ status: HttpStatus.CONFLICT, description: '중복 에러' })
   @Post('/signup')
-  async signUp(@Body() user: SignUpDto): Promise<SignUpDto> {
-    return await this.userService.signUp(user);
+  async signUp(@Body() user: SignUpDto): Promise<DefaultResponseDto<null>> {
+    return {
+      message: '회원가입 성공',
+      result: 'Success',
+      statusCode: 201,
+    };
   }
 
   @ApiResponse({ status: HttpStatus.CREATED, description: '로그인 성공' })
@@ -44,8 +49,16 @@ export class UserController {
     description: '정보가 일치하지 않거나 존재 하지 않음',
   })
   @Post('/login')
-  async logIn(@Body() input: LogInDto): Promise<{ accessToken: string }> {
-    return await this.userService.logIn(input);
+  async logIn(
+    @Body() input: LogInDto,
+  ): Promise<DefaultResponseDto<LoginResponseDto>> {
+    const accessToken = await this.userService.logIn(input);
+    return {
+      message: '로그인 성공',
+      result: 'Success',
+      statusCode: 200,
+      data: accessToken,
+    };
   }
 
   @ApiResponse({
@@ -60,7 +73,7 @@ export class UserController {
   async createUserAddress(
     @Body() userAddress: CreateUserAddressDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     const userId = user.id;
     await this.userService.createUserAddress(userAddress, userId);
     return {
@@ -85,7 +98,7 @@ export class UserController {
   async deleteUserAddress(
     @Param('userAddressId', ParseIntPipe) userAddressId: number,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.userService.deleteUserAddress(userAddressId, user.id);
     return {
       message: '주소 삭제 성공',
@@ -126,7 +139,7 @@ export class UserController {
     @Body()
     addressInfo: UpdateUserAddressDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.userService.updateUserAddressById(
       userAddressId,
       addressInfo,
@@ -156,7 +169,7 @@ export class UserController {
   async createBusinessLicense(
     @Body() businessLicenceInfo: BusinessLicenseDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.userService.createBusinessLicense(
       businessLicenceInfo.businessId,
       user.id,
@@ -193,7 +206,7 @@ export class UserController {
   async deleteUserBusinessLicense(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.userService.deleteUserBusinessLicense(id, user.id);
     return {
       message: '[사업자 등록 정보] 제거 성공',
