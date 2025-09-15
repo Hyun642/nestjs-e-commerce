@@ -48,9 +48,9 @@ export class UserController {
   ): Promise<DefaultResponseDto<LoginResponseDto>> {
     const accessToken = await this.userService.logIn(input);
     return {
-      message: '회원가입 성공',
+      message: '로그인 성공',
       result: 'Success',
-      statusCode: 201,
+      statusCode: 200,
       data: accessToken,
     };
   }
@@ -134,7 +134,7 @@ export class UserController {
   async createBusinessLicense(
     @Body() body: BusinessLicenseDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.userService.createBusinessLicense(body.businessId, user.id);
     return {
       message: '[사업자 등록 정보] 등록 성공',
@@ -160,7 +160,7 @@ export class UserController {
   async deleteUserBusinessLicense(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.userService.deleteUserBusinessLicense(id, user.id);
     return {
       message: '[사업자 등록 정보] 제거 성공',
