@@ -36,7 +36,7 @@ export class OrderController {
     @Body() orderInfo: OrderDto,
     @GetUser()
     user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.orderService.order(orderInfo, user.id);
     return {
       message: '[주문] 주문 성공',
@@ -64,7 +64,7 @@ export class OrderController {
   async refund(
     @Param('id') orderId: string,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.orderService.refund(orderId, user.id);
     return {
       message: '[주문] 환불 요청 성공',
@@ -92,7 +92,7 @@ export class OrderController {
   async return(
     @Param('id') orderId: string,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.orderService.return(orderId, user.id);
     return {
       message: '[주문] 반품 요청 성공',

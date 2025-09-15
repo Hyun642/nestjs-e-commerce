@@ -44,7 +44,7 @@ export class ProductController {
     @Param('shopId') shopId: string,
     @Body() product: ProductDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.productService.createProduct(shopId, user.id, product);
     return {
       message: '[상품 등록 정보] 등록 성공',
@@ -85,7 +85,7 @@ export class ProductController {
     @Param('productId') productId: string,
     @Param('shopId') shopId: string,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.productService.deleteProduct(productId, shopId, user.id);
     return {
       message: '[상품 등록 정보] 삭제 성공',
@@ -112,7 +112,7 @@ export class ProductController {
     @Param('shopId') shopId: string,
     @Body() product: ProductDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.productService.updateProduct(
       productId,
       shopId,

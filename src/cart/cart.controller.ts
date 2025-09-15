@@ -34,7 +34,7 @@ export class CartController {
   async addCartItem(
     @Body() itemInfo: AddCartItem,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.cartService.addCartItem(itemInfo, user.id);
     return {
       message: '[장바구니 아이템 정보] 등록 성공',
@@ -73,7 +73,7 @@ export class CartController {
     @Param('cartItemId') cartItemId: number,
     @GetUser()
     user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.cartService.deleteCartItem(cartItemId, user.id);
     return {
       message: '[장바구니 아이템 정보] 삭제 성공',
@@ -98,7 +98,7 @@ export class CartController {
     @Param('cartItemId') cartItemId: number,
     @Body() itemInfo: AddCartItem,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.cartService.updateCartItem(cartItemId, itemInfo, user.id);
     return {
       message: '[장바구니 아이템 정보] 수정 성공',

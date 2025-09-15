@@ -35,7 +35,7 @@ export class ReviewController {
   async createReview(
     @Body() reviewInfo: CreateReviewDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.reviewService.createReview(reviewInfo, user.id);
     return {
       message: '[리뷰] 리뷰 등록 성공',
@@ -72,7 +72,7 @@ export class ReviewController {
   async deleteProductReview(
     @Param('reviewId') reviewId: number,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.reviewService.deleteProductReview(reviewId, user.id);
     return {
       message: '[상품 리뷰 정보] 삭제 성공',
@@ -98,7 +98,7 @@ export class ReviewController {
     @Param('reviewId') reviewId: number,
     @GetUser() user: User,
     @Body() reviewInfo: UpdateReviewDto,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.reviewService.updateProductReview(reviewInfo, reviewId, user.id);
     return {
       message: '[상품 리뷰 정보] 수정 성공',

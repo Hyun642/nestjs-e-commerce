@@ -37,7 +37,7 @@ export class ShopController {
   async createShop(
     @Body() shopInfo: CreateShopDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.shopService.createShop(shopInfo, user.id);
     return {
       message: '[상점 등록 정보] 등록 성공',
@@ -91,7 +91,7 @@ export class ShopController {
     @Param('shopId') shopId: string,
     @Body() body: CreateShopDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.shopService.updateMyShopById(shopId, user.id, body);
     return {
       message: '[상점 등록 정보] 업데이트 성공',
@@ -112,7 +112,7 @@ export class ShopController {
   async deleteMyShopById(
     @Param('shopId') shopId: string,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.shopService.deleteMyShopById(shopId, user.id);
     return {
       message: '[상점 등록 정보] 삭제 성공',

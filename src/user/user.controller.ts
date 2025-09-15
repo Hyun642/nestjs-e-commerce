@@ -36,6 +36,7 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.CONFLICT, description: '중복 에러' })
   @Post('/signup')
   async signUp(@Body() user: SignUpDto): Promise<DefaultResponseDto<null>> {
+    await this.userService.signUp(user);
     return {
       message: '회원가입 성공',
       result: 'Success',
