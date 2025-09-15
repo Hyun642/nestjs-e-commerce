@@ -23,6 +23,7 @@ import { DefaultResponseDto } from 'src/common/dto/response.dto';
 import { BusinessLicenseDto } from '../dto/businessLicense/businessLicense.dto';
 import { UserAddressEntity } from '../dto/entity/userAddress.entity';
 import { UpdateUserAddressDto } from '../dto/address/updateUserAddress.dto';
+import { LoginResponseDto } from '../dto/login-response.dto';
 
 @Controller('user')
 export class UserController {
@@ -31,7 +32,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: '회원가입 성공' })
   @ApiResponse({ status: 409, description: '중복 에러' })
   @Post('/signup')
-  async signUp(@Body() user: SignUpDto): Promise<DefaultResponseDto> {
+  async signUp(@Body() user: SignUpDto): Promise<DefaultResponseDto<null>> {
     await this.userService.signUp(user);
     return {
       message: '회원가입 성공',
@@ -42,8 +43,16 @@ export class UserController {
 
   @ApiResponse({ status: 201, description: '로그인 성공' })
   @Post('/login')
-  async logIn(@Body() input: LogInDto): Promise<{ accessToken: string }> {
-    return await this.userService.logIn(input);
+  async logIn(
+    @Body() input: LogInDto,
+  ): Promise<DefaultResponseDto<LoginResponseDto>> {
+    const accessToken = await this.userService.logIn(input);
+    return {
+      message: '회원가입 성공',
+      result: 'Success',
+      statusCode: 201,
+      data: accessToken,
+    };
   }
 
   @Post('/sendtokentest')
@@ -60,7 +69,7 @@ export class UserController {
   async createUserAddress(
     @Body() userAddress: CreateUserAddressDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     const userId = user.id;
     await this.userService.createUserAddress(userAddress, userId);
     return {
@@ -77,7 +86,7 @@ export class UserController {
   async deleteUserAddress(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.userService.deleteUserAddress(id, user.id);
     return {
       message: '주소 삭제 성공',
@@ -103,7 +112,7 @@ export class UserController {
   async updateUserAddressById(
     @Body() body: UpdateUserAddressDto,
     @GetUser() user: User,
-  ): Promise<DefaultResponseDto> {
+  ): Promise<DefaultResponseDto<null>> {
     await this.userService.updateUserAddressById(body, user.id);
     return {
       message: '주소 변경 성공',
