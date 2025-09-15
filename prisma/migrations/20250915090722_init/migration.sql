@@ -1,16 +1,22 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "OrderStatus" AS ENUM ('결제완료', '배송중', '도착', '환불진행', '환불완료', '반품진행', '반품완료');
 
-  - The primary key for the `User` table will be changed. If it partially fails, the table could be left without primary key constraint.
+-- CreateEnum
+CREATE TYPE "ReviewScore" AS ENUM ('ONE', 'TWO', 'THREE', 'FOUR', 'FIVE');
 
-*/
--- AlterTable
-ALTER TABLE "User" DROP CONSTRAINT "User_pkey",
-ALTER COLUMN "id" DROP DEFAULT,
-ALTER COLUMN "id" SET DATA TYPE TEXT,
-ALTER COLUMN "password" SET DATA TYPE VARCHAR(60),
-ADD CONSTRAINT "User_pkey" PRIMARY KEY ("id");
-DROP SEQUENCE "User_id_seq";
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "email" VARCHAR(50) NOT NULL,
+    "password" VARCHAR(60) NOT NULL,
+    "name" VARCHAR(10) NOT NULL,
+    "phoneNumber" VARCHAR(20) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "UserAddress" (
@@ -100,10 +106,11 @@ CREATE TABLE "ProductOptionUnit" (
 
 -- CreateTable
 CREATE TABLE "ProductReview" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "productId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "score" INTEGER NOT NULL,
+    "orderItemId" INTEGER NOT NULL,
+    "score" "ReviewScore" NOT NULL,
     "content" VARCHAR(100) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -115,12 +122,62 @@ CREATE TABLE "ProductReview" (
 -- CreateTable
 CREATE TABLE "ProductReviewImage" (
     "id" SERIAL NOT NULL,
-    "productReviewId" TEXT NOT NULL,
+    "productReviewId" INTEGER NOT NULL,
     "url" TEXT NOT NULL,
     "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "ProductReviewImage_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateTable
+CREATE TABLE "CartItem" (
+    "id" SERIAL NOT NULL,
+    "userId" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "CartItem_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "CartItemOptionUnit" (
+    "cartItemId" INTEGER NOT NULL,
+    "productOptionUnitId" INTEGER NOT NULL,
+
+    CONSTRAINT "CartItemOptionUnit_pkey" PRIMARY KEY ("cartItemId","productOptionUnitId")
+);
+
+-- CreateTable
+CREATE TABLE "Order" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "userAddressId" INTEGER NOT NULL,
+    "orderStatus" "OrderStatus" NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "canceledAt" TIMESTAMP(3),
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OrderItem" (
+    "id" SERIAL NOT NULL,
+    "orderId" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "productOptionUnitId" INTEGER NOT NULL,
+    "quantity" INTEGER NOT NULL,
+
+    CONSTRAINT "OrderItem_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_phoneNumber_key" ON "User"("phoneNumber");
 
 -- AddForeignKey
 ALTER TABLE "UserAddress" ADD CONSTRAINT "UserAddress_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -150,4 +207,34 @@ ALTER TABLE "ProductReview" ADD CONSTRAINT "ProductReview_productId_fkey" FOREIG
 ALTER TABLE "ProductReview" ADD CONSTRAINT "ProductReview_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "ProductReview" ADD CONSTRAINT "ProductReview_orderItemId_fkey" FOREIGN KEY ("orderItemId") REFERENCES "OrderItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "ProductReviewImage" ADD CONSTRAINT "ProductReviewImage_productReviewId_fkey" FOREIGN KEY ("productReviewId") REFERENCES "ProductReview"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CartItem" ADD CONSTRAINT "CartItem_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CartItem" ADD CONSTRAINT "CartItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CartItemOptionUnit" ADD CONSTRAINT "CartItemOptionUnit_cartItemId_fkey" FOREIGN KEY ("cartItemId") REFERENCES "CartItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CartItemOptionUnit" ADD CONSTRAINT "CartItemOptionUnit_productOptionUnitId_fkey" FOREIGN KEY ("productOptionUnitId") REFERENCES "ProductOptionUnit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_userAddressId_fkey" FOREIGN KEY ("userAddressId") REFERENCES "UserAddress"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productOptionUnitId_fkey" FOREIGN KEY ("productOptionUnitId") REFERENCES "ProductOptionUnit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
