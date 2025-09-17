@@ -107,6 +107,7 @@ export class UserRepository {
     return await this.prisma.userAddress.findMany({
       where: {
         userId,
+        deletedAt: null,
       },
     });
   }
