@@ -203,12 +203,12 @@ export class UserController {
   })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
-  @Delete('/business-licenses/:licenseId')
+  @Delete('/business-licenses/:businessId')
   async deleteUserBusinessLicense(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('businessId') businessId: string,
     @GetUser() user: User,
   ): Promise<DefaultResponseDto<null>> {
-    await this.userService.deleteUserBusinessLicense(id, user.id);
+    await this.userService.deleteUserBusinessLicense(businessId, user.id);
     return {
       message: '[사업자 등록 정보] 제거 성공',
       result: 'success',

@@ -175,11 +175,14 @@ export class UserRepository {
     return info;
   }
 
-  async deleteUserBusinessLicense(id: number, userId: string): Promise<void> {
-    const info = await this.prisma.businessLicense.findUnique({
+  async deleteUserBusinessLicense(
+    businessId: string,
+    userId: string,
+  ): Promise<void> {
+    const info = await this.prisma.businessLicense.findFirst({
       where: {
         userId: userId,
-        id: id,
+        businessId: businessId,
         deletedAt: null,
       },
     });
@@ -187,9 +190,9 @@ export class UserRepository {
       throw new NotFoundException('삭제할 사업자 등록번호를 찾을 수 없습니다.');
     }
 
-    await this.prisma.businessLicense.update({
+    await this.prisma.businessLicense.updateMany({
       where: {
-        id: id,
+        businessId: businessId,
       },
       data: {
         deletedAt: new Date(),

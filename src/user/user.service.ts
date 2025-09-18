@@ -62,7 +62,13 @@ export class UserService {
     return await this.userRepository.getUserBusinessLicense(userId);
   }
 
-  async deleteUserBusinessLicense(id: number, userId: string): Promise<void> {
-    return await this.userRepository.deleteUserBusinessLicense(id, userId);
+  async deleteUserBusinessLicense(
+    businessId: string,
+    userId: string,
+  ): Promise<void> {
+    return await this.userRepository.deleteUserBusinessLicense(
+      businessId,
+      userId,
+    );
   }
 }
