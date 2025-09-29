@@ -29,6 +29,7 @@ export class ShopRepository {
         deletedAt: null,
       },
       select: {
+        id: true,
         name: true,
         description: true,
         createdAt: true,
@@ -43,6 +44,7 @@ export class ShopRepository {
         deletedAt: null,
       },
       select: {
+        id: true,
         name: true,
         description: true,
         createdAt: true,
