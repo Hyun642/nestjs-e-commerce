@@ -26,6 +26,16 @@ export class ShopController {
   constructor(private readonly shopService: ShopService) {}
 
   @ApiResponse({
+    status: HttpStatus.OK,
+    description: '상점 검색 성공',
+    type: SearchShopDto,
+  })
+  @Get('/search')
+  async searchShop(@Query() query: SearchDto): Promise<SearchShopDto> {
+    return await this.shopService.searchShop(query);
+  }
+
+  @ApiResponse({
     status: HttpStatus.CREATED,
     description: '상점 등록 성공',
     type: DefaultResponseDto,
@@ -119,15 +129,5 @@ export class ShopController {
       result: 'success',
       statusCode: HttpStatus.OK,
     };
-  }
-
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: '상점 검색 성공',
-    type: SearchShopDto,
-  })
-  @Get('/search')
-  async searchShop(@Query() query: SearchDto): Promise<SearchShopDto> {
-    return await this.shopService.searchShop(query);
   }
 }
